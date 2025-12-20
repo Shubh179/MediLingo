@@ -38,7 +38,7 @@ const PharmacyFinder = () => {
     }
     navigator.geolocation.getCurrentPosition(async (pos) => {
       const { latitude, longitude } = pos.coords;
-      const radius = 3000; // meters
+      const radius = 1500; // 1.5 km
       const query = `
         [out:json];
         (
@@ -67,10 +67,13 @@ const PharmacyFinder = () => {
               distanceKm: haversine(latitude, longitude, lat, lon),
             } as Pharmacy;
           })
-          .filter((x: Pharmacy) => x.lat && x.lon)
+          .filter((x: Pharmacy) => x.lat && x.lon && x.distanceKm && x.distanceKm <= 1.5)
           .sort((a: Pharmacy, b: Pharmacy) => (a.distanceKm ?? 0) - (b.distanceKm ?? 0))
           .slice(0, 5);
         setPharmacies(items);
+        if (items.length === 0) {
+          setError('No pharmacies found within 1.5 km');
+        }
       } catch (e) {
         setError('Failed to fetch nearby pharmacies');
       } finally {
@@ -94,7 +97,7 @@ const PharmacyFinder = () => {
           <span className="text-sm font-medium text-muted-foreground">Nearby Pharmacies</span>
         </div>
         <Button size="sm" onClick={findNearby} disabled={loading}>
-          {loading ? 'Finding…' : 'Find 5 nearest'}
+          {loading ? 'Finding…' : 'Find nearby (1.5km)'}
         </Button>
       </div>
       {error && <p className="text-xs text-destructive mb-2">{error}</p>}

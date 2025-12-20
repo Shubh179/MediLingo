@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import TimeSection from "./TimeSection";
 import PharmacyFinder from "@/components/PharmacyFinder";
+import { HospitalFinder } from "@/components/HospitalFinder";
 import Chatbot from "@/components/Chatbot";
 import PriceComparison from "@/components/PriceComparison";
 import AdvancedChatbot from "@/components/AdvancedChatbot";
@@ -301,51 +302,97 @@ const DashboardView = ({ onBack, prescriptionImage, decipherText }: DashboardVie
             </div>
           </TabsContent>
 
-          <TabsContent value="assist">
+          <TabsContent value="assist" className="space-y-4">
             <div className="grid gap-4 lg:grid-cols-3">
+              {/* Left Column - Reminders & WhatsApp */}
               <div className="space-y-4 lg:col-span-1">
                 <ReminderCard />
-                <div className="card-elevated p-4 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <MessageCircle className="w-5 h-5 text-primary" />
-                    <p className="text-sm font-medium text-secondary">WhatsApp Quick Send</p>
+                
+                {/* WhatsApp Card - Premium Styled */}
+                <div className="card-elevated p-5 space-y-4 bg-gradient-to-br from-white/50 to-white/30 border border-green-100">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-green-100">
+                      <MessageCircle className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-secondary">WhatsApp Alert</p>
+                      <p className="text-xs text-muted-foreground">Notify your caregiver</p>
+                    </div>
                   </div>
-                  <Input value={waPhone} onChange={(e) => setWaPhone(e.target.value)} placeholder="e.g. +9198xxxxxxx" />
-                  <textarea 
-                    value={waMsg} 
-                    onChange={(e) => setWaMsg(e.target.value)} 
-                    placeholder="Message" 
-                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  />
-                  <div className="flex items-center gap-2">
-                    <Checkbox 
-                      id="save-caregiver" 
-                      checked={saveCaregiver} 
-                      onCheckedChange={(checked) => setSaveCaregiver(!!checked)} 
-                    />
-                    <label htmlFor="save-caregiver" className="text-sm text-muted-foreground cursor-pointer">
-                      Save caregiver number
-                    </label>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-xs font-semibold text-muted-foreground mb-2 block">Caregiver Number</label>
+                      <Input 
+                        value={waPhone} 
+                        onChange={(e) => setWaPhone(e.target.value)} 
+                        placeholder="e.g. +9198xxxxxxx"
+                        className="h-10 border-green-200 focus-visible:ring-green-500"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="text-xs font-semibold text-muted-foreground mb-2 block">Custom Message</label>
+                      <textarea 
+                        value={waMsg} 
+                        onChange={(e) => setWaMsg(e.target.value)} 
+                        placeholder="Your message here..." 
+                        className="flex min-h-[80px] w-full rounded-md border border-green-200 bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      />
+                    </div>
+                    
+                    <div className="flex items-center gap-2 p-2 bg-green-50 rounded-lg">
+                      <Checkbox 
+                        id="save-caregiver" 
+                        checked={saveCaregiver} 
+                        onCheckedChange={(checked) => setSaveCaregiver(!!checked)} 
+                      />
+                      <label htmlFor="save-caregiver" className="text-xs text-muted-foreground cursor-pointer">
+                        Save this number for future use
+                      </label>
+                    </div>
+                    
+                    <Button 
+                      onClick={openWhatsApp}
+                      className="w-full h-10 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all"
+                    >
+                      <MessageCircle className="w-4 h-4 mr-2" />
+                      Send via WhatsApp
+                    </Button>
+                    <p className="text-xs text-muted-foreground text-center">Auto-includes medicine details</p>
                   </div>
-                  <Button className="w-full" onClick={openWhatsApp}>Send via WhatsApp</Button>
-                  <p className="text-xs text-muted-foreground">Message includes next medicine details.</p>
                 </div>
               </div>
+
+              {/* Middle Column - Pharmacy & Hospital */}
               <div className="space-y-4 lg:col-span-1">
                 <PharmacyFinder />
+                <HospitalFinder />
                 <PriceComparison />
               </div>
+
+              {/* Right Column - Chatbots */}
               <div className="space-y-4 lg:col-span-1">
-                <div className="card-elevated p-4">
-                  <Tabs defaultValue="basic">
-                    <TabsList className="w-full">
-                      <TabsTrigger className="flex-1" value="basic">Guidance</TabsTrigger>
-                      <TabsTrigger className="flex-1" value="advanced">Personalized</TabsTrigger>
+                <div className="card-elevated p-5 border border-primary/20">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 rounded-lg bg-primary/10">
+                      <MessageCircle className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-secondary">Health Assistant</p>
+                      <p className="text-xs text-muted-foreground">Ask any health question</p>
+                    </div>
+                  </div>
+                  
+                  <Tabs defaultValue="basic" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2 mb-4">
+                      <TabsTrigger value="basic" className="text-xs">Quick Guidance</TabsTrigger>
+                      <TabsTrigger value="advanced" className="text-xs">Personalized</TabsTrigger>
                     </TabsList>
-                    <TabsContent value="basic">
+                    <TabsContent value="basic" className="space-y-3">
                       <Chatbot />
                     </TabsContent>
-                    <TabsContent value="advanced">
+                    <TabsContent value="advanced" className="space-y-3">
                       <AdvancedChatbot />
                     </TabsContent>
                   </Tabs>

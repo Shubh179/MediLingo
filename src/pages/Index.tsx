@@ -3,13 +3,15 @@ import { Helmet } from "react-helmet";
 import GlassNav from "@/components/layout/GlassNav";
 import HeroSection from "@/components/landing/HeroSection";
 import DashboardView from "@/components/dashboard/DashboardView";
+import PrescriptionChatbotPage from "@/components/PrescriptionChatbotPage";
 import PhotoUpload from "@/components/upload/PhotoUpload";
 import { LanguageProvider, useLanguage } from "@/contexts/LanguageContext";
 import { PlanProvider, usePlan } from "@/contexts/PlanContext";
+import { MedicineHistoryProvider } from "@/contexts/MedicineHistoryContext";
 import { toast } from "@/components/ui/use-toast";
 import { useAiScan } from "@/hooks/useAiScan";
 
-type View = "landing" | "upload" | "dashboard";
+type View = "landing" | "upload" | "dashboard" | "prescription-chatbot";
 
 const IndexContent = () => {
   const [currentView, setCurrentView] = useState<View>("landing");
@@ -18,7 +20,7 @@ const IndexContent = () => {
   const [decipherText, setDecipherText] = useState<string | null>(null);
   const { t } = useLanguage();
   const { plan, canUseScan, recordScan, usage } = usePlan();
-  const { scan } = useAiScan();
+  const { scan, progress } = useAiScan();
 
   // Lock scroll on landing/upload so the page feels fixed-height
   useEffect(() => {
@@ -45,7 +47,19 @@ const IndexContent = () => {
       });
       return;
     }
-    setCurrentView("upload");
+    
+    // Check for manually entered text
+    const manualText = sessionStorage.getItem('manualPrescriptionText');
+    if (manualText) {
+      setDecipherText(manualText);
+      sessionStorage.removeItem('manualPrescriptionText');
+      recordScan();
+      setCurrentView("dashboard");
+      return;
+    }
+    
+    // Go to new prescription + chatbot page
+    setCurrentView("prescription-chatbot");
   };
 
   const handleUpload = async (file: File) => {
@@ -105,6 +119,24 @@ const IndexContent = () => {
     setPrescriptionImage(null);
   };
 
+  if (currentView === "prescription-chatbot") {
+    return (
+      <>
+        <Helmet>
+          <title>Prescription & Medicine Assistant | MediLingo</title>
+          <meta name="description" content="Upload prescription and chat with medicine assistant." />
+        </Helmet>
+        <PrescriptionChatbotPage
+          onBack={() => {
+            setCurrentView("landing");
+            setPrescriptionImage(null);
+            setDecipherText(null);
+          }}
+        />
+      </>
+    );
+  }
+
   if (currentView === "dashboard") {
     return (
       <>
@@ -144,6 +176,21 @@ const IndexContent = () => {
             isProcessing={isProcessing}
           />
         )}
+        
+        {isProcessing && progress > 0 && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+              <h3 className="font-semibold text-lg mb-2">Scanning prescription...</h3>
+              <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                <div 
+                  className="bg-primary h-2.5 rounded-full transition-all duration-300" 
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-gray-600">{progress}% complete</p>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
@@ -152,7 +199,11 @@ const IndexContent = () => {
 const Index = () => {
   return (
     <LanguageProvider>
-      <IndexContent />
+      <PlanProvider>
+        <MedicineHistoryProvider>
+          <IndexContent />
+        </MedicineHistoryProvider>
+      </PlanProvider>
     </LanguageProvider>
   );
 };
