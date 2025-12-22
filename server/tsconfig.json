@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",                /* Modern JS version */
+    "module": "ESNext",                /* ES modules for modern Node.js */
+    "moduleResolution": "node",        /* Node.js module resolution */
+    "rootDir": "./src",                /* Where your TS files live */
+    "outDir": "./dist",                /* Where compiled JS goes */
+    "esModuleInterop": true,           /* Fixes common import issues */
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,                    /* Enables all type-checking */
+    "skipLibCheck": true,
+    "resolveJsonModule": true          /* Allows importing .json files */
+  },
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  },
+  "include": ["src/**/*"],             /* Only compile files in src */
+  "exclude": ["node_modules"]
+}
