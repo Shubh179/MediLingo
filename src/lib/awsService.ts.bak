@@ -1,0 +1,205 @@
+import { TextractClient, AnalyzeDocumentCommand } from '@aws-sdk/client-textract';
+import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
+
+// Initialize AWS clients
+const getTextractClient = () => {
+  return new TextractClient({
+    region: import.meta.env.VITE_AWS_REGION || 'us-east-1',
+    credentials: {
+      accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID || '',
+      secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY || '',
+    },
+  });
+};
+
+const getBedrockClient = () => {
+  return new BedrockRuntimeClient({
+    region: import.meta.env.VITE_AWS_REGION || 'us-east-1',
+    credentials: {
+      accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID || '',
+      secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY || '',
+    },
+  });
+};
+
+export interface Medicine {
+  name: string;
+  dosage: string;
+  frequency: string;
+  instructions: string;
+}
+
+export interface PrescriptionAnalysis {
+  medicines: Medicine[];
+  patientInfo: string;
+  doctorInfo: string;
+  rawText: string;
+}
+
+export interface BedrockResponse {
+  text: string;
+  actionType?: 'record_dose' | 'find_hospital' | 'general';
+}
+
+/**
+ * Extract text from prescription image using AWS Textract
+ */
+export async function extractPrescriptionText(imageBase64: string): Promise<string> {
+  try {
+    const client = getTextractClient();
+    
+    // Convert base64 to bytes
+    const imageBytes = Uint8Array.from(atob(imageBase64.split(',')[1]), c => c.charCodeAt(0));
+
+    const command = new AnalyzeDocumentCommand({
+      Document: {
+        Bytes: imageBytes,
+      },
+      FeatureTypes: ['TABLES', 'FORMS'],
+    });
+
+    const response = await client.send(command);
+
+    // Extract text from blocks
+    let extractedText = '';
+    if (response.Blocks) {
+      response.Blocks.forEach(block => {
+        if (block.BlockType === 'LINE' && block.Text) {
+          extractedText += block.Text + '\n';
+        }
+      });
+    }
+
+    return extractedText;
+  } catch (error) {
+    console.error('Textract error:', error);
+    throw new Error('Failed to analyze prescription. Please check your AWS credentials.');
+  }
+}
+
+/**
+ * Analyze prescription text using AWS Bedrock (Claude)
+ */
+export async function analyzePrescriptionWithBedrock(prescriptionText: string): Promise<PrescriptionAnalysis> {
+  try {
+    const client = getBedrockClient();
+
+    const prompt = `Analyze this prescription text and extract the following information in JSON format:
+{
+  "medicines": [
+    {
+      "name": "medicine name",
+      "dosage": "dosage amount",
+      "frequency": "how often to take",
+      "instructions": "any special instructions"
+    }
+  ],
+  "patientInfo": "patient information if available",
+  "doctorInfo": "doctor information if available"
+}
+
+Prescription text:
+${prescriptionText}
+
+Return ONLY valid JSON, no additional text.`;
+
+    const command = new InvokeModelCommand({
+      modelId: 'anthropic.claude-3-sonnet-20240229-v1:0',
+      body: JSON.stringify({
+        anthropic_version: 'bedrock-2023-06-01',
+        max_tokens: 1024,
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+      }),
+    });
+
+    const response = await client.send(command);
+    const responseText = new TextDecoder().decode(response.body);
+    const parsed = JSON.parse(responseText);
+
+    // Extract the text from Bedrock response
+    let analysisText = '';
+    if (parsed.content && Array.isArray(parsed.content)) {
+      analysisText = parsed.content[0]?.text || '';
+    }
+
+    // Parse the JSON response
+    const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const analysis = JSON.parse(jsonMatch[0]);
+      return {
+        medicines: analysis.medicines || [],
+        patientInfo: analysis.patientInfo || '',
+        doctorInfo: analysis.doctorInfo || '',
+        rawText: prescriptionText,
+      };
+    }
+
+    throw new Error('Could not parse Bedrock response');
+  } catch (error) {
+    console.error('Bedrock analysis error:', error);
+    throw new Error('Failed to analyze prescription with Bedrock. Please check your AWS credentials.');
+  }
+}
+
+/**
+ * Chat with Bedrock Claude for medicine questions
+ */
+export async function chatWithBedrock(userMessage: string, medicines: Medicine[]): Promise<BedrockResponse> {
+  try {
+    const client = getBedrockClient();
+
+    const medicineList = medicines.map(m => `${m.name} - ${m.dosage}, ${m.frequency}: ${m.instructions}`).join('\n');
+
+    const prompt = `You are a helpful medicine assistant. Your current medicines are:
+${medicineList || 'No medicines uploaded yet'}
+
+User message: ${userMessage}
+
+Respond with helpful advice about the medicines, finding hospitals, or dose tracking. Keep responses concise.`;
+
+    const command = new InvokeModelCommand({
+      modelId: 'anthropic.claude-3-sonnet-20240229-v1:0',
+      body: JSON.stringify({
+        anthropic_version: 'bedrock-2023-06-01',
+        max_tokens: 512,
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+      }),
+    });
+
+    const response = await client.send(command);
+    const responseText = new TextDecoder().decode(response.body);
+    const parsed = JSON.parse(responseText);
+
+    let text = '';
+    if (parsed.content && Array.isArray(parsed.content)) {
+      text = parsed.content[0]?.text || '';
+    }
+
+    // Determine action type
+    let actionType: 'record_dose' | 'find_hospital' | 'general' = 'general';
+    const lowerMessage = userMessage.toLowerCase();
+    if (lowerMessage.includes('hospital') || lowerMessage.includes('clinic')) {
+      actionType = 'find_hospital';
+    } else if (lowerMessage.includes('dose') || lowerMessage.includes('taken')) {
+      actionType = 'record_dose';
+    }
+
+    return {
+      text,
+      actionType,
+    };
+  } catch (error) {
+    console.error('Bedrock chat error:', error);
+    throw new Error('Failed to get response from Bedrock. Please check your AWS credentials.');
+  }
+}

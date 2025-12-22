@@ -1,0 +1,186 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* MediLingo Color System */
+    --background: 210 40% 98%; /* Soft Slate #F8FAFC */
+    --foreground: 222 47% 11%; /* Trust Navy */
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* Medical Teal - Primary */
+    --primary: 168 82% 32%; /* #0D9488 */
+    --primary-foreground: 0 0% 100%;
+
+    /* Trust Navy - Secondary */
+    --secondary: 224 76% 33%; /* #1E3A8A */
+    --secondary-foreground: 0 0% 100%;
+
+    /* Soft backgrounds */
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    /* Accent - Mint Tint */
+    --accent: 166 76% 94%;
+    --accent-foreground: 168 82% 32%;
+
+    /* Warm Coral - Alerts Only */
+    --destructive: 350 89% 60%; /* #F43F5E */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 168 82% 32%;
+
+    --radius: 1rem;
+
+    /* Custom MediLingo tokens */
+    --morning: 48 96% 89%;
+    --morning-accent: 38 92% 50%;
+    --afternoon: 33 100% 96%;
+    --afternoon-accent: 25 95% 53%;
+    --night: 226 70% 95%;
+    --night-accent: 226 70% 40%;
+    
+    --glass: 0 0% 100% / 0.7;
+    --glass-border: 0 0% 100% / 0.3;
+
+    --shadow-soft: 0 4px 20px -4px hsl(222 47% 11% / 0.08);
+    --shadow-elevated: 0 8px 30px -6px hsl(222 47% 11% / 0.12);
+    --shadow-glow: 0 0 40px hsl(168 82% 32% / 0.15);
+  }
+
+  .dark {
+    --background: 222 47% 8%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 168 76% 42%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 224 60% 50%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 168 50% 20%;
+    --accent-foreground: 168 76% 70%;
+
+    --destructive: 350 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 168 76% 42%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-size: 18px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+}
+
+@layer components {
+  .glass-nav {
+    @apply bg-[hsl(var(--glass))] backdrop-blur-xl border-b border-[hsl(var(--glass-border))];
+  }
+
+  .card-elevated {
+    @apply bg-card rounded-3xl shadow-[var(--shadow-soft)] border border-border/50;
+  }
+
+  .card-glow {
+    @apply bg-card rounded-3xl shadow-[var(--shadow-glow)] border border-primary/20;
+  }
+
+  .time-section-morning {
+    @apply bg-[hsl(var(--morning))] border-l-4 border-[hsl(var(--morning-accent))];
+  }
+
+  .time-section-afternoon {
+    @apply bg-[hsl(var(--afternoon))] border-l-4 border-[hsl(var(--afternoon-accent))];
+  }
+
+  .time-section-night {
+    @apply bg-[hsl(var(--night))] border-l-4 border-[hsl(var(--night-accent))];
+  }
+
+  .btn-touch {
+    @apply w-full py-4 px-6 text-lg font-semibold rounded-2xl transition-all duration-200 active:scale-[0.98];
+  }
+
+  .pill-badge {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium;
+  }
+}
+
+@layer utilities {
+  .pulse-gentle {
+    animation: pulse-gentle 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse-gentle {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+  }
+
+  .fade-up {
+    animation: fade-up 0.5s ease-out forwards;
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .slide-in-bottom {
+    animation: slide-in-bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes slide-in-bottom {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+}
