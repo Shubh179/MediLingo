@@ -166,13 +166,13 @@ const Chatbot = ({ isOpen, onClose, initialMessage }: ChatbotProps) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="w-full h-[90vh] max-w-6xl bg-slate-900 rounded-lg border border-slate-700 flex overflow-hidden">
+      <div className="w-full h-[90vh] max-w-6xl bg-white rounded-lg border border-gray-200 flex overflow-hidden">
         {/* Close Button */}
         <Button
           onClick={onClose}
           variant="ghost"
           size="icon"
-          className="absolute top-4 right-4 text-slate-400 hover:text-slate-100 hover:bg-slate-800 z-10"
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 hover:bg-gray-100 z-10"
         >
           <X className="w-5 h-5" />
         </Button>

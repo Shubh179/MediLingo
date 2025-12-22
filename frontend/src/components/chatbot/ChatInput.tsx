@@ -25,7 +25,7 @@ const ChatInput = ({ onSendMessage, isLoading }: ChatInputProps) => {
   };
 
   return (
-    <div className="border-t border-slate-700 bg-slate-800 px-6 py-4">
+    <div className="border-t border-gray-200 bg-white px-6 py-4">
       <div className="flex gap-3 max-w-4xl mx-auto">
         <Input
           value={input}
@@ -33,7 +33,7 @@ const ChatInput = ({ onSendMessage, isLoading }: ChatInputProps) => {
           onKeyPress={handleKeyPress}
           placeholder="Ask about medications, dosages, schedules..."
           disabled={isLoading}
-          className="bg-slate-700 border-slate-600 text-slate-100 placeholder-slate-400 focus:border-primary focus:ring-primary"
+          className="bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500 focus:border-primary focus:ring-primary"
         />
         <Button
           onClick={handleSend}

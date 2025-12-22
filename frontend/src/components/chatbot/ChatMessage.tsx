@@ -13,12 +13,12 @@ const ChatMessage = ({ role, content, isLoading }: ChatMessageProps) => {
   return (
     <div className={cn(
       "flex gap-4 py-4 px-6 group",
-      isUser ? "justify-end bg-transparent" : "justify-start bg-slate-800/50"
+      isUser ? "justify-end bg-transparent" : "justify-start bg-gray-50"
     )}>
       {!isUser && (
         <div className="flex-shrink-0 flex items-start pt-1">
-          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-primary to-emerald-500">
-            <MessageCircle className="w-5 h-5 text-white" />
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary">
+            <span className="text-white text-sm">💚</span>
           </div>
         </div>
       )}
@@ -30,8 +30,8 @@ const ChatMessage = ({ role, content, isLoading }: ChatMessageProps) => {
         <div className={cn(
           "px-4 py-3 rounded-lg max-w-2xl break-words",
           isUser
-            ? "bg-primary text-primary-foreground rounded-br-none"
-            : "bg-slate-700 text-slate-100 rounded-bl-none"
+            ? "bg-primary text-white rounded-br-none"
+            : "bg-gray-100 text-gray-900 rounded-bl-none"
         )}>
           {isLoading ? (
             <div className="flex gap-2 items-center">

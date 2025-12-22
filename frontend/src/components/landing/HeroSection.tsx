@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useState } from "react";
 import PrescriptionCard from "./PrescriptionCard";
+import PrescriptionUpload from "./PrescriptionUpload";
 import {
   Dialog,
   DialogContent,
@@ -95,40 +96,44 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
   };
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-12 pb-80 px-5 flex flex-col overflow-hidden relative">
+    <section className="min-h-screen h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-12 pb-12 px-5 flex flex-col relative overflow-hidden">
+      {/* Grid background - entire page */}
+      <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none z-0" style={{
+        backgroundImage: `linear-gradient(to right, rgba(16, 185, 129, 0.3) 1px, transparent 1px), linear-gradient(to bottom, rgba(16, 185, 129, 0.3) 1px, transparent 1px)`,
+        backgroundSize: '40px 40px'
+      }}></div>
+      
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-32 right-10 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl animate-pulse delay-700"></div>
       </div>
 
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-start">
-        {/* Trust Badge */}
-        <div className="flex justify-center mb-6 fade-up" style={{ animationDelay: "0.1s" }}>
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30 backdrop-blur-sm hover:border-primary/50 transition-all">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-semibold text-primary">{t.hero.trustBadge}</span>
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center">
+        {/* Prescription Upload Component */}
+        <div className="w-full mb-6 fade-up" style={{ animationDelay: "0.1s" }}>
+          <PrescriptionUpload 
+            onCameraClick={handleCameraClick}
+            onUploadClick={handleGalleryClick}
+          />
+        </div>
+
+        {/* Chat Input Box */}
+        <div className="w-full max-w-2xl mx-auto mb-4 fade-up" style={{ animationDelay: "0.15s" }}>
+          <div 
+            onClick={() => {
+              setChatInitialMessage(null);
+              setShowChatbot(true);
+            }}
+            className="flex items-center gap-3 px-4 py-2.5 bg-white border-2 border-gray-200 rounded-lg cursor-text hover:border-primary/40 transition-all"
+          >
+            <MessageCircle className="w-4 h-4 text-gray-400" />
+            <span className="text-gray-400 text-sm">Ask me anything about your prescription...</span>
           </div>
         </div>
 
-        {/* Main Heading - Premium Typography */}
-        <div className="text-center mb-8 fade-up max-w-3xl" style={{ animationDelay: "0.2s" }}>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-secondary leading-tight mb-4 tracking-tight">
-            {t.hero.title1}
-            <br />
-            <span className="bg-gradient-to-r from-primary to-emerald-500 bg-clip-text text-transparent">
-              {t.hero.title2}
-            </span>
-            <br />
-            {t.hero.title3}
-          </h1>
-          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed font-light">
-            {t.hero.subtitle}
-          </p>
-        </div>
-
         {/* Features Pills */}
-        <div className="flex flex-wrap justify-center gap-2 mb-12 fade-up" style={{ animationDelay: "0.25s" }}>
+        <div className="flex flex-wrap justify-center gap-2 fade-up" style={{ animationDelay: "0.2s" }}>
           {[
             { icon: "📷", text: "Instant Scan", clickable: true, handler: handleScanClick },
             { icon: "🔍", text: "AI Recognition", clickable: true, handler: handleAIRecognition },
@@ -137,54 +142,13 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
             <div 
               key={i} 
               onClick={feature.clickable ? feature.handler : undefined}
-              className={`px-3 py-1.5 rounded-lg bg-white/5 border border-primary/20 backdrop-blur-sm text-xs md:text-sm text-secondary hover:border-primary/40 transition-all ${
-                feature.clickable ? 'cursor-pointer hover:bg-primary/10 hover:scale-105' : ''
+              className={`px-4 py-2 rounded-lg bg-white border-2 border-gray-200 backdrop-blur-sm text-xs md:text-sm text-gray-700 hover:border-primary/40 transition-all ${
+                feature.clickable ? 'cursor-pointer hover:bg-gray-50 hover:scale-105' : ''
               }`}
             >
               <span className="mr-1">{feature.icon}</span>{feature.text}
             </div>
           ))}
-        </div>
-
-        {/* Visual Card - Prescription to Notification */}
-        <div className="flex-1 flex items-center justify-center w-full mb-12 fade-up" style={{ animationDelay: "0.3s" }}>
-          <div className="relative w-full max-w-md">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-emerald-500/20 rounded-3xl blur-2xl"></div>
-            <div className="relative">
-              <PrescriptionCard />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom CTA Sheet - Fixed Position */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background/95 to-transparent pt-12 z-40">
-        <div className="card-glow p-5 space-y-3 max-w-md mx-auto rounded-2xl border border-primary/30">
-          {/* Two Main Options */}
-          <div className="grid grid-cols-1 gap-3">
-            {/* Scan Prescription Button */}
-            <Button 
-              onClick={handleScanClick}
-              className="w-full h-14 bg-gradient-to-r from-primary to-emerald-500 hover:from-primary/90 hover:to-emerald-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all"
-            >
-              <Camera className="w-5 h-5 mr-2" />
-              Scan Prescription
-            </Button>
-
-            {/* Chat with Me Button */}
-            <Button 
-              onClick={handleChat}
-              variant="outline"
-              className="w-full h-14 border-2 border-primary hover:bg-primary/10 font-semibold rounded-xl transition-all"
-            >
-              <MessageCircle className="w-5 h-5 mr-2" />
-              Chat with me
-            </Button>
-          </div>
-
-          <p className="text-center text-xs text-muted-foreground">
-            {t.hero.noAccount}
-          </p>
         </div>
       </div>
 

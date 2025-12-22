@@ -24,13 +24,13 @@ const ChatSidebar = ({
   onDeleteChat,
 }: ChatSidebarProps) => {
   return (
-    <div className="w-64 bg-slate-900 border-r border-slate-700 flex flex-col h-full">
+    <div className="w-64 bg-gray-50 border-r border-gray-200 flex flex-col h-full">
       {/* Header */}
-      <div className="p-4 border-b border-slate-700">
+      <div className="p-4 border-b border-gray-200">
         <Button
           onClick={onNewChat}
           variant="outline"
-          className="w-full bg-slate-800 border-slate-600 text-slate-100 hover:bg-slate-700"
+          className="w-full bg-white border-primary text-primary hover:bg-primary/5"
         >
           <Plus className="w-4 h-4 mr-2" />
           New Chat
@@ -41,7 +41,7 @@ const ChatSidebar = ({
       <ScrollArea className="flex-1">
         <div className="p-3 space-y-2">
           {chats.length === 0 ? (
-            <p className="text-xs text-slate-500 text-center py-8">
+            <p className="text-xs text-gray-400 text-center py-8">
               No chat history yet
             </p>
           ) : (
@@ -50,8 +50,8 @@ const ChatSidebar = ({
                 key={chat.id}
                 className={`group flex items-center justify-between gap-2 px-3 py-2 rounded-lg cursor-pointer transition-colors ${
                   activeChat === chat.id
-                    ? 'bg-slate-700 text-slate-100'
-                    : 'text-slate-400 hover:bg-slate-800'
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-gray-600 hover:bg-gray-200'
                 }`}
               >
                 <button
@@ -66,7 +66,7 @@ const ChatSidebar = ({
                     e.stopPropagation();
                     onDeleteChat(chat.id);
                   }}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:text-red-400"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:text-red-500"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -77,7 +77,7 @@ const ChatSidebar = ({
       </ScrollArea>
 
       {/* Footer */}
-      <div className="border-t border-slate-700 p-4 space-y-2 text-xs text-slate-500">
+      <div className="border-t border-gray-200 p-4 space-y-2 text-xs text-gray-500">
         <p>MediLingo Assistant v1.0</p>
         <p className="text-slate-600">© 2025. All rights reserved.</p>
       </div>

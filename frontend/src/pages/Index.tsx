@@ -22,14 +22,9 @@ const IndexContent = () => {
   const { plan, canUseScan, recordScan, usage } = usePlan();
   const { scan, progress } = useAiScan();
 
-  // Lock scroll on landing/upload so the page feels fixed-height
+  // Allow scroll for all views
   useEffect(() => {
-    const shouldLock = currentView !== "dashboard";
-    if (shouldLock) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
+    document.body.style.overflow = "auto";
     return () => {
       document.body.style.overflow = "auto";
     };

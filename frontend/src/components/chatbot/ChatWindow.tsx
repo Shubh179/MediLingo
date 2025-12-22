@@ -25,18 +25,18 @@ const ChatWindow = ({ messages }: ChatWindowProps) => {
   }, [messages]);
 
   return (
-    <ScrollArea className="flex-1 w-full bg-slate-900 overflow-hidden">
+    <ScrollArea className="flex-1 w-full bg-white overflow-hidden">
       <div className="flex flex-col h-full">
         {messages.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-4 px-6 py-8">
-            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-primary to-emerald-500 opacity-20">
-              <MessageCircle className="w-8 h-8 text-primary" />
+            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-primary/10">
+              <span className="text-3xl">💚</span>
             </div>
             <div className="text-center">
-              <h2 className="text-2xl font-semibold text-slate-100 mb-2">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-2">
                 MediLingo Assistant
               </h2>
-              <p className="text-slate-400 max-w-sm">
+              <p className="text-gray-600 max-w-sm">
                 Ask me anything about medications, dosages, schedules, side effects, or health-related questions.
               </p>
             </div>
