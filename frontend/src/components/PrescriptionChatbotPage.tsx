@@ -20,6 +20,13 @@ const PrescriptionChatbotPage = ({ onBack }: PrescriptionChatbotPageProps) => {
   const { user } = useAuth();
   const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5001';
   const { addMedicines } = useMedicineHistory();
+
+  // Debug: Log current user state
+  useEffect(() => {
+    console.log('📋 PrescriptionChatbotPage mounted');
+    console.log('👤 Current user:', user);
+    console.log('🔗 API URL:', API_BASE_URL);
+  }, [user, API_BASE_URL]);
   const { scan } = useAiScan();
 
   const [showUpload, setShowUpload] = useState(false);
@@ -113,13 +120,15 @@ const PrescriptionChatbotPage = ({ onBack }: PrescriptionChatbotPageProps) => {
           }
 
           // Send OCR text to backend to store prescription (requires login for userId)
-          try {
-            if (!user?.id) {
-              toast({
-                title: 'Login required',
-                description: 'Please login to save your prescription to your account.',
-              });
-            } else {
+          if (!user?.id) {
+            console.warn('⚠️ User not logged in, skipping prescription save');
+            toast({
+              title: 'Login to save prescriptions',
+              description: 'Sign in to store this prescription in your account.',
+            });
+          } else {
+            try {
+              console.log('📤 Saving prescription for user:', user.id);
               const resp = await fetch(`${API_BASE_URL}/api/prescriptions/upload`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -131,26 +140,32 @@ const PrescriptionChatbotPage = ({ onBack }: PrescriptionChatbotPageProps) => {
                 }),
               });
 
+              console.log('✅ Response status:', resp.status);
+              
               if (!resp.ok) {
                 const errData = await resp.json().catch(() => ({}));
-                throw new Error(errData?.message || 'Failed to save prescription');
+                throw new Error(errData?.message || `Server error: ${resp.status}`);
               }
 
               const data = await resp.json();
+              console.log('✅ Backend response:', data);
+              
               if (data?.success) {
                 toast({
-                  title: 'Prescription saved',
-                  description: 'Your prescription has been stored in your account.',
+                  title: 'Prescription saved!',
+                  description: `Stored ${data.prescription?.medicinesCount || 0} medicines in your account.`,
                 });
+              } else {
+                throw new Error(data?.message || 'Save failed');
               }
+            } catch (saveErr) {
+              console.error('❌ Save prescription error:', saveErr);
+              toast({
+                title: 'Could not save prescription',
+                description: saveErr instanceof Error ? saveErr.message : 'Server error while saving',
+                variant: 'destructive',
+              });
             }
-          } catch (saveErr) {
-            console.error('Save prescription error:', saveErr);
-            toast({
-              title: 'Could not save prescription',
-              description: saveErr instanceof Error ? saveErr.message : 'Server error while saving',
-              variant: 'destructive',
-            });
           }
 
           setShowUpload(false);

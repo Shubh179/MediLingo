@@ -148,12 +148,10 @@ const SimplePrescriptionPage = ({ onBack, prescriptionText, prescriptionImage }:
       (async () => {
         try {
           if (!user?.id) {
-            toast({
-              title: 'Login required',
-              description: 'Login to save your prescription to your account.',
-            });
+            console.warn('⚠️ User not logged in, skipping prescription save');
             return;
           }
+          console.log('📤 Saving prescription for user:', user.id);
           const resp = await fetch(`${API_BASE_URL}/api/prescriptions/upload`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -164,16 +162,25 @@ const SimplePrescriptionPage = ({ onBack, prescriptionText, prescriptionImage }:
               targetLanguage: language === 'en' ? 'English' : language === 'hi' ? 'Hindi' : 'Marathi',
             }),
           });
+          
+          console.log('✅ Response status:', resp.status);
+          
           if (!resp.ok) {
             const errData = await resp.json().catch(() => ({}));
-            throw new Error(errData?.message || 'Failed to save prescription');
+            throw new Error(errData?.message || `Server error: ${resp.status}`);
           }
+          
           const data = await resp.json();
+          console.log('✅ Backend response:', data);
+          
           if (data?.success) {
-            toast({ title: 'Prescription saved', description: 'Stored in your account.' });
+            toast({ 
+              title: 'Prescription saved!', 
+              description: `Stored ${data.prescription?.medicinesCount || 0} medicines in your account.` 
+            });
           }
         } catch (e) {
-          console.error('Save prescription error:', e);
+          console.error('❌ Save prescription error:', e);
           toast({
             title: 'Could not save prescription',
             description: e instanceof Error ? e.message : 'Server error while saving',

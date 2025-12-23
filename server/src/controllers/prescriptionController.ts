@@ -163,21 +163,71 @@ export const saveRawPrescription = async (req: Request, res: Response): Promise<
       return;
     }
 
-    // Parse basic medicine info from OCR text
-    const lines = rawOcrText.split('\n').filter((l: string) => l.trim());
-    const medicines = [];
+    // Parse basic medicine info from OCR text with improved extraction
+    const medicines: any[] = [];
+    const seenMedicines = new Set<string>(); // Avoid duplicates
     
-    for (const line of lines) {
-      const medicineMatch = line.match(/^([A-Z][a-z\s]+?)\s*(\d+\s*(?:mg|ml|g)?)?/);
-      if (medicineMatch && medicineMatch[1].length > 2 && medicineMatch[1].length < 50) {
+    // Method 1: Look for patterns with dosages (most reliable)
+    const dosagePattern = /([A-Za-z\s]+?)\s+(\d+(?:\.\d+)?)\s*(mg|ml|g|units|IU)\b/gi;
+    let dosageMatch;
+    while ((dosageMatch = dosagePattern.exec(rawOcrText)) !== null) {
+      const medicineName = dosageMatch[1].trim();
+      const dosage = `${dosageMatch[2]} ${dosageMatch[3]}`;
+      
+      // Filter out common non-medicine words
+      if (medicineName.length > 2 && medicineName.length < 100 && 
+          !medicineName.match(/^(for|take|after|before|meals|daily|twice|thrice|times|and|or|Type|Diabetes|meal|day|hours)$/i) &&
+          !seenMedicines.has(medicineName.toLowerCase())) {
         medicines.push({
-          name: medicineMatch[1].trim(),
-          dosage: medicineMatch[2]?.trim() || 'As prescribed',
+          name: medicineName,
+          dosage: dosage,
           frequency: 'As directed',
           simpleInstruction: 'Follow doctor\'s instructions',
         });
+        seenMedicines.add(medicineName.toLowerCase());
       }
     }
+    
+    // Method 2: Look for medicine names followed by common patterns (Tab., Syp., Cap., etc.)
+    const commonMedicinePattern = /(?:Tab\.|Syp\.|Cap\.|Inj\.|drops|liquid)?\s*([A-Za-z][A-Za-z\s]+?)\s*(?:\d+\s*(?:mg|ml|g)?)?(?:\s*(?:BD|OD|TDS|QID|once|twice|thrice)|$)/gi;
+    let commonMatch;
+    while ((commonMatch = commonMedicinePattern.exec(rawOcrText)) !== null) {
+      const medicineName = commonMatch[1].trim();
+      if (medicineName.length > 2 && medicineName.length < 100 && 
+          !medicineName.match(/^(for|take|after|before|meals|daily|twice|thrice|times|Type|Diabetes)$/i) &&
+          !seenMedicines.has(medicineName.toLowerCase())) {
+        medicines.push({
+          name: medicineName,
+          dosage: 'As prescribed',
+          frequency: 'As directed',
+          simpleInstruction: 'Follow doctor\'s instructions',
+        });
+        seenMedicines.add(medicineName.toLowerCase());
+      }
+    }
+    
+    // Method 3: If still no medicines found, try to extract capitalized words (last resort)
+    if (medicines.length === 0) {
+      const capitalizedPattern = /\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\b/g;
+      let capMatch;
+      while ((capMatch = capitalizedPattern.exec(rawOcrText)) !== null) {
+        const word = capMatch[1];
+        // Skip common English words and medical terms that aren't medicines
+        if (word.length > 2 && word.length < 100 &&
+            !word.match(/^(Dr|Rx|Type|Diabetes|Dosage|Frequency|Take|Twice|Daily|After|Meals|Instructions)$/i) &&
+            !seenMedicines.has(word.toLowerCase())) {
+          medicines.push({
+            name: word,
+            dosage: 'As prescribed',
+            frequency: 'As directed',
+            simpleInstruction: 'Follow doctor\'s instructions',
+          });
+          seenMedicines.add(word.toLowerCase());
+        }
+      }
+    }
+    
+    console.log(`🔍 Extracted ${medicines.length} medicines from OCR:`, medicines.map((m: any) => m.name));
 
     // Save prescription
     const newPrescription = await Prescription.create({
