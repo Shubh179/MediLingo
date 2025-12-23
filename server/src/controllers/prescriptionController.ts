@@ -143,3 +143,92 @@ export const processPrescription = async (req: Request, res: Response) => {
     });
   }
 };
+
+/**
+ * SAVE RAW PRESCRIPTION - Simple endpoint that just saves OCR text without AI processing
+ * Used by frontend when Gemini API is unavailable or for quick saves
+ * Required fields: userId, rawOcrText
+ * Optional: targetLanguage
+ */
+export const saveRawPrescription = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { userId, rawOcrText, targetLanguage } = req.body;
+
+    // Validation
+    if (!userId || !rawOcrText) {
+      res.status(400).json({
+        success: false,
+        message: 'userId and rawOcrText are required',
+      });
+      return;
+    }
+
+    // Parse basic medicine info from OCR text
+    const lines = rawOcrText.split('\n').filter((l: string) => l.trim());
+    const medicines = [];
+    
+    for (const line of lines) {
+      const medicineMatch = line.match(/^([A-Z][a-z\s]+?)\s*(\d+\s*(?:mg|ml|g)?)?/);
+      if (medicineMatch && medicineMatch[1].length > 2 && medicineMatch[1].length < 50) {
+        medicines.push({
+          name: medicineMatch[1].trim(),
+          dosage: medicineMatch[2]?.trim() || 'As prescribed',
+          frequency: 'As directed',
+          simpleInstruction: 'Follow doctor\'s instructions',
+        });
+      }
+    }
+
+    // Save prescription
+    const newPrescription = await Prescription.create({
+      userId,
+      rawText: rawOcrText,
+      doctorName: 'Not extracted',
+      medications: medicines.length > 0 ? medicines : [{
+        name: 'Medicine details',
+        dosage: 'See prescription text',
+        frequency: 'As directed',
+        simpleInstruction: rawOcrText.substring(0, 100),
+      }],
+      scannedAt: new Date(),
+    });
+
+    // Update medical history
+    await MedicalHistory.findOneAndUpdate(
+      { userId },
+      {
+        $push: {
+          activeMedications: {
+            $each: medicines.map((m: any) => ({
+              name: m.name,
+              prescriptionId: newPrescription._id,
+              prescribedDate: new Date(),
+            })),
+          },
+        },
+        $set: { lastUpdated: new Date() },
+      },
+      { upsert: true, new: true }
+    );
+
+    console.log(`✅ Prescription saved for user ${userId}: ${medicines.length} medicines extracted`);
+
+    res.status(201).json({
+      success: true,
+      message: 'Prescription saved successfully',
+      prescription: {
+        id: newPrescription._id,
+        userId: newPrescription.userId,
+        medicinesCount: medicines.length,
+        medicines: medicines.map((m: any) => m.name),
+      },
+    });
+  } catch (error: any) {
+    console.error('Save Raw Prescription Error:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to save prescription',
+      error: error.message,
+    });
+  }
+};
