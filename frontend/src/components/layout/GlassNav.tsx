@@ -17,35 +17,67 @@ import { usePlan } from "@/contexts/PlanContext";
 
 const GlassNav = () => {
   const { t } = useLanguage();
-  const { isAuthenticated, login, logout } = useAuth();
+  const { isAuthenticated, login, logout, signup } = useAuth();
   const { plan, setPlan } = usePlan();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [age, setAge] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isSignupMode, setIsSignupMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(email, password);
-    setIsOpen(false);
-    resetForm();
+    setIsLoading(true);
+    try {
+      await login(email, password);
+      setIsOpen(false);
+      resetForm();
+    } catch (error) {
+      console.error("Login failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validation
+    if (!firstName.trim() || !lastName.trim()) {
+      alert("Please enter your full name");
+      return;
+    }
+    
+    if (!age || parseInt(age) < 1 || parseInt(age) > 150) {
+      alert("Please enter a valid age (1-150)");
+      return;
+    }
+    
     if (password !== confirmPassword) {
       alert("Passwords don't match!");
       return;
     }
-    // TODO: Implement actual signup API call
-    console.log("Signup:", { email, password, firstName, lastName });
-    // For now, just login after signup
-    await login(email, password);
-    setIsOpen(false);
-    resetForm();
+    
+    if (password.length < 6) {
+      alert("Password must be at least 6 characters");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const fullName = `${firstName} ${lastName}`;
+      await signup(email, password, parseInt(age), fullName);
+      setIsOpen(false);
+      resetForm();
+    } catch (error) {
+      console.error("Signup failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const resetForm = () => {
@@ -196,6 +228,7 @@ const GlassNav = () => {
                           value={firstName}
                           onChange={(e) => setFirstName(e.target.value)}
                           required
+                          disabled={isLoading}
                         />
                       </div>
                       <div className="space-y-2">
@@ -206,8 +239,25 @@ const GlassNav = () => {
                           value={lastName}
                           onChange={(e) => setLastName(e.target.value)}
                           required
+                          disabled={isLoading}
                         />
                       </div>
+                    </div>
+                  )}
+                  {isSignupMode && (
+                    <div className="space-y-2">
+                      <Label htmlFor="age">Age</Label>
+                      <Input
+                        id="age"
+                        type="number"
+                        placeholder="Your age"
+                        min="1"
+                        max="150"
+                        value={age}
+                        onChange={(e) => setAge(e.target.value)}
+                        required
+                        disabled={isLoading}
+                      />
                     </div>
                   )}
                   <div className="space-y-2">
@@ -219,6 +269,7 @@ const GlassNav = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
+                      disabled={isLoading}
                     />
                   </div>
                   <div className="space-y-2">
@@ -230,6 +281,7 @@ const GlassNav = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
+                      disabled={isLoading}
                     />
                   </div>
                   {isSignupMode && (
@@ -242,11 +294,12 @@ const GlassNav = () => {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
+                        disabled={isLoading}
                       />
                     </div>
                   )}
-                  <Button type="submit" className="w-full">
-                    {isSignupMode ? "Sign Up" : "Login"}
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "Processing..." : (isSignupMode ? "Create Account" : "Login")}
                   </Button>
                   <div className="text-center">
                     <Button
