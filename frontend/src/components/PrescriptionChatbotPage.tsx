@@ -5,6 +5,7 @@ import PhotoUpload from '@/components/upload/PhotoUpload';
 import AdvancedChatbot from '@/components/AdvancedChatbot';
 import { useMedicineHistory } from '@/contexts/MedicineHistoryContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/use-toast';
 import { useAiScan } from '@/hooks/useAiScan';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -15,7 +16,9 @@ interface PrescriptionChatbotPageProps {
 }
 
 const PrescriptionChatbotPage = ({ onBack }: PrescriptionChatbotPageProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { user } = useAuth();
+  const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5001';
   const { addMedicines } = useMedicineHistory();
   const { scan } = useAiScan();
 
@@ -106,6 +109,47 @@ const PrescriptionChatbotPage = ({ onBack }: PrescriptionChatbotPageProps) => {
             toast({
               title: 'Prescription scanned',
               description: 'Text extracted. You can now chat about your medicines.',
+            });
+          }
+
+          // Send OCR text to backend to store prescription (requires login for userId)
+          try {
+            if (!user?.id) {
+              toast({
+                title: 'Login required',
+                description: 'Please login to save your prescription to your account.',
+              });
+            } else {
+              const resp = await fetch(`${API_BASE_URL}/api/prescriptions/upload`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({
+                  userId: user.id,
+                  rawOcrText: extractedText,
+                  targetLanguage: language === 'en' ? 'English' : language === 'hi' ? 'Hindi' : 'Marathi',
+                }),
+              });
+
+              if (!resp.ok) {
+                const errData = await resp.json().catch(() => ({}));
+                throw new Error(errData?.message || 'Failed to save prescription');
+              }
+
+              const data = await resp.json();
+              if (data?.success) {
+                toast({
+                  title: 'Prescription saved',
+                  description: 'Your prescription has been stored in your account.',
+                });
+              }
+            }
+          } catch (saveErr) {
+            console.error('Save prescription error:', saveErr);
+            toast({
+              title: 'Could not save prescription',
+              description: saveErr instanceof Error ? saveErr.message : 'Server error while saving',
+              variant: 'destructive',
             });
           }
 

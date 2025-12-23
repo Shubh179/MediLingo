@@ -4,6 +4,7 @@ import ChatWindow, { Message } from './ChatWindow';
 import ChatInput from './ChatInput';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ChatbotProps {
   isOpen: boolean;
@@ -60,6 +61,8 @@ const getMedicationResponse = (input: string): string => {
 };
 
 const Chatbot = ({ isOpen, onClose, initialMessage }: ChatbotProps) => {
+  const { user } = useAuth();
+  const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5001';
   const [chats, setChats] = useState<Record<string, Message[]>>({
     default: [
       {
@@ -131,21 +134,33 @@ const Chatbot = ({ isOpen, onClose, initialMessage }: ChatbotProps) => {
 
     setIsLoading(true);
 
-    // Simulate bot typing delay
-    setTimeout(() => {
-      const response = getMedicationResponse(message);
+    try {
+      const resp = await fetch(`${API_BASE_URL}/api/prescriptions/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ userId: user?.id, userMessage: message }),
+      });
+
+      let replyText = '';
+      if (resp.ok) {
+        const data = await resp.json();
+        replyText = data?.reply || '';
+      } else {
+        // Fallback to local response if API returns error
+        replyText = getMedicationResponse(message);
+      }
+
       const botMessage: Message = {
         id: `msg-${Date.now() + 1}`,
         role: 'bot',
-        content: response,
+        content: replyText || getMedicationResponse(message),
       };
 
       setChats((prev) => ({
         ...prev,
         [activeChat]: [...(prev[activeChat] || []), botMessage],
       }));
-
-      setIsLoading(false);
 
       // Update chat title if it's a new chat
       if (!chatHistories.find((c) => c.id === activeChat)) {
@@ -159,7 +174,19 @@ const Chatbot = ({ isOpen, onClose, initialMessage }: ChatbotProps) => {
           ...prev,
         ]);
       }
-    }, 800);
+    } catch (e) {
+      const botMessage: Message = {
+        id: `msg-${Date.now() + 1}`,
+        role: 'bot',
+        content: getMedicationResponse(message),
+      };
+      setChats((prev) => ({
+        ...prev,
+        [activeChat]: [...(prev[activeChat] || []), botMessage],
+      }));
+    } finally {
+      setIsLoading(false);
+    }
   }, [activeChat, chatHistories]);
 
   if (!isOpen) return null;

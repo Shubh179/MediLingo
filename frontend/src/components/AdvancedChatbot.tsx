@@ -6,6 +6,7 @@ import { useMedicineHistory } from '@/contexts/MedicineHistoryContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ChatMessage {
   id: string;
@@ -23,6 +24,8 @@ interface Hospital {
 
 const AdvancedChatbot = ({ prescriptionText }: { prescriptionText?: string }) => {
   const { medicines, recordDose } = useMedicineHistory();
+  const { user } = useAuth();
+  const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5001';
   
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
@@ -158,38 +161,57 @@ const AdvancedChatbot = ({ prescriptionText }: { prescriptionText?: string }) =>
         setLoading(false);
         return;
       }
+      // Prefer backend chatbot with medical history context
+      try {
+        const resp = await fetch(`${API_BASE_URL}/api/prescriptions/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            userId: user?.id,
+            userMessage,
+          }),
+        });
 
-      // Simple rule-based responses based on user history
-      let response = '';
-      
-      // Check for medicine-specific questions
-      const medicineNames = medicines.map(m => m.name.toLowerCase());
-      const mentionedMedicine = medicineNames.find(name => lowerMessage.includes(name));
-      
-      if (mentionedMedicine) {
-        const medicine = medicines.find(m => m.name.toLowerCase() === mentionedMedicine);
-        if (medicine) {
-          if (lowerMessage.includes('when') || lowerMessage.includes('time')) {
-            response = `Based on your history, ${medicine.name} is typically taken at ${medicine.timeOfDay}. Maintain consistency for best results.`;
-          } else if (lowerMessage.includes('dose') || lowerMessage.includes('how much')) {
-            response = `Your usual dose for ${medicine.name} is ${medicine.dosage}. Do not adjust without consulting your doctor.`;
-          } else if (lowerMessage.includes('side effect')) {
-            response = `For any side effects from ${medicine.name}, please consult your healthcare provider immediately.`;
-          } else {
-            response = `${medicine.name} - ${medicine.dosage}. ${medicine.instructions || 'Take as prescribed.'}`;
-          }
+        if (!resp.ok) {
+          const errData = await resp.json().catch(() => ({}));
+          throw new Error(errData?.error || errData?.message || 'Chat request failed');
         }
-      } else if (lowerMessage.includes('miss') || lowerMessage.includes('forgot')) {
-        response = 'If you missed a dose, take it as soon as you remember unless it\'s close to your next scheduled dose. Never double up. Consult your pharmacist for specific guidance.';
-      } else if (lowerMessage.includes('schedule') || lowerMessage.includes('routine')) {
-        response = `Your current routine includes ${medicines.length} medicine(s). Consistency is key - take them at the same times daily.`;
-      } else if (lowerMessage.includes('side effect') || lowerMessage.includes('reaction')) {
-        response = 'If you experience any unusual symptoms or side effects, contact your healthcare provider immediately. Don\'t stop medications without medical advice.';
-      } else {
-        response = `Based on your history with ${medicines.length} medicine(s), maintain your current schedule. For specific medical advice, please consult your healthcare provider.`;
+        const data = await resp.json();
+        if (data?.reply) {
+          addBotMessage(data.reply);
+        } else {
+          throw new Error('Empty chatbot response');
+        }
+      } catch (apiErr) {
+        // Fallback to simple local rule-based response if backend fails
+        let response = '';
+        const medicineNames = medicines.map(m => m.name.toLowerCase());
+        const mentionedMedicine = medicineNames.find(name => lowerMessage.includes(name));
+        if (mentionedMedicine) {
+          const medicine = medicines.find(m => m.name.toLowerCase() === mentionedMedicine);
+          if (medicine) {
+            if (lowerMessage.includes('when') || lowerMessage.includes('time')) {
+              response = `Based on your history, ${medicine.name} is typically taken at ${medicine.timeOfDay}. Maintain consistency for best results.`;
+            } else if (lowerMessage.includes('dose') || lowerMessage.includes('how much')) {
+              response = `Your usual dose for ${medicine.name} is ${medicine.dosage}. Do not adjust without consulting your doctor.`;
+            } else if (lowerMessage.includes('side effect')) {
+              response = `For any side effects from ${medicine.name}, please consult your healthcare provider immediately.`;
+            } else {
+              response = `${medicine.name} - ${medicine.dosage}. ${medicine.instructions || 'Take as prescribed.'}`;
+            }
+          }
+        } else if (lowerMessage.includes('miss') || lowerMessage.includes('forgot')) {
+          response = 'If you missed a dose, take it as soon as you remember unless it\'s close to your next scheduled dose. Never double up. Consult your pharmacist for specific guidance.';
+        } else if (lowerMessage.includes('schedule') || lowerMessage.includes('routine')) {
+          response = `Your current routine includes ${medicines.length} medicine(s). Consistency is key - take them at the same times daily.`;
+        } else if (lowerMessage.includes('side effect') || lowerMessage.includes('reaction')) {
+          response = 'If you experience any unusual symptoms or side effects, contact your healthcare provider immediately. Don\'t stop medications without medical advice.';
+        } else {
+          response = `Based on your history with ${medicines.length} medicine(s), maintain your current schedule. For specific medical advice, please consult your healthcare provider.`;
+        }
+        addBotMessage(response);
       }
-
-      addBotMessage(response);
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to get response';
       setError(errorMsg);
