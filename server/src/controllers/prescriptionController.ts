@@ -97,6 +97,7 @@ export const processPrescription = async (req: Request, res: Response) => {
     const embeddingResult = await embeddingModel.embedContent({
       content: { role: "user", parts: [{ text: rawOcrText }] },
       taskType: TaskType.RETRIEVAL_DOCUMENT, // Optimized for storing in a DB
+      outputDimensionality: 384, // Force 384 dims to match existing dataset/model expectations
     });
     const vector = embeddingResult.embedding.values;
     // -------------------------------
