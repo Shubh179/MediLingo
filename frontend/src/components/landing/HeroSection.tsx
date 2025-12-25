@@ -22,6 +22,7 @@ import BloodBankFinder from "@/components/BloodBankFinder";
 import JanAushadhiFinder from "@/components/JanAushadhiFinder";
 import BookAppointment from "@/components/BookAppointment";
 import MedicineDelivery from "@/components/MedicineDelivery";
+import ActionSidebar from "./ActionSidebar";
 
 interface HeroSectionProps {
   onScanClick: () => void;
@@ -122,6 +123,17 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
 
   return (
     <section className="min-h-[calc(100svh-4rem)] md:min-h-[calc(100vh-4rem)] bg-gradient-to-br from-background via-background to-primary/5 px-5 pb-[env(safe-area-inset-bottom)] flex flex-col relative overflow-hidden">
+            {/* Left Collapsible Action Sidebar */}
+            <ActionSidebar
+              onAmbulance={openAmbulanceFinder}
+              onBloodBank={openBloodBankFinder}
+              onJanAushadhi={openJanAushadhiFinder}
+              onScanPrescription={handleScanClick}
+              onNearbyHospitals={openHospitalFinder}
+              onNearbyPharmacies={openPharmacyFinder}
+              onBookAppointment={openAppointmentDialog}
+              onMedicineDelivery={openDeliveryDialog}
+            />
       {/* Grid background - entire page */}
       <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none z-0" style={{
         backgroundImage: `linear-gradient(to right, rgba(16, 185, 129, 0.3) 1px, transparent 1px), linear-gradient(to bottom, rgba(16, 185, 129, 0.3) 1px, transparent 1px)`,
@@ -143,36 +155,7 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
           />
         </div>
 
-        {/* Emergency Quick Access */}
-        <div className="w-full max-w-2xl mx-auto flex flex-wrap justify-center gap-2 fade-up mb-3" style={{ animationDelay: "0.12s" }}>
-          <Button
-            size="sm"
-            variant="outline"
-            className="gap-2 px-4 py-2.5 text-sm rounded-full border-2 border-red-500/70 text-red-600 bg-white shadow-md hover:bg-red-50 hover:scale-105 transition-all font-medium"
-            onClick={openAmbulanceFinder}
-          >
-            <Ambulance className="w-4 h-4" />
-            Ambulance
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="gap-2 px-4 py-2.5 text-sm rounded-full border-2 border-rose-500/70 text-rose-600 bg-white shadow-md hover:bg-rose-50 hover:scale-105 transition-all font-medium"
-            onClick={openBloodBankFinder}
-          >
-            <Droplets className="w-4 h-4" />
-            Blood Bank
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="gap-2 px-4 py-2.5 text-sm rounded-full border-2 border-emerald-600/70 text-emerald-700 bg-white shadow-md hover:bg-emerald-50 hover:scale-105 transition-all font-medium"
-            onClick={openJanAushadhiFinder}
-          >
-            <Pill className="w-4 h-4" />
-            Jan Aushadhi
-          </Button>
-        </div>
+        {/* Removed emergency quick access buttons; available in sidebar */}
 
         {/* Chat Input Box */}
         <div className="w-full max-w-2xl mx-auto mb-3 fade-up" style={{ animationDelay: "0.18s" }}>
@@ -203,54 +186,7 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
           </div>
         </div>
 
-        {/* Quick Action Buttons */}
-        <div className="w-full max-w-2xl mx-auto flex flex-wrap justify-center gap-2 fade-up mt-1 mb-4" style={{ animationDelay: "0.24s" }}>
-          <Button
-            size="sm"
-            variant="outline"
-            className="gap-2 px-4 py-2.5 text-sm rounded-full border-2 border-primary/70 text-primary bg-white shadow-md hover:bg-primary/10 hover:scale-105 transition-all font-medium"
-            onClick={handleScanClick}
-          >
-            <Camera className="w-4 h-4" />
-            {t.hero.scanButton}
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="gap-2 px-4 py-2.5 text-sm rounded-full border-2 border-primary/70 text-primary bg-white shadow-md hover:bg-primary/10 hover:scale-105 transition-all font-medium"
-            onClick={openHospitalFinder}
-          >
-            <Building2 className="w-4 h-4" />
-            {t.nav.nearbyHospitals}
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="gap-2 px-4 py-2.5 text-sm rounded-full border-2 border-primary/70 text-primary bg-white shadow-md hover:bg-primary/10 hover:scale-105 transition-all font-medium"
-            onClick={openPharmacyFinder}
-          >
-            <MapPin className="w-4 h-4" />
-            {t.nav.nearbyPharmacies}
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="gap-2 px-4 py-2.5 text-sm rounded-full border-2 border-blue-500/70 text-blue-600 bg-white shadow-md hover:bg-blue-50 hover:scale-105 transition-all font-medium"
-            onClick={openAppointmentDialog}
-          >
-            <CalendarCheck className="w-4 h-4" />
-            Book Appointment
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="gap-2 px-4 py-2.5 text-sm rounded-full border-2 border-emerald-600/70 text-emerald-700 bg-white shadow-md hover:bg-emerald-50 hover:scale-105 transition-all font-medium"
-            onClick={openDeliveryDialog}
-          >
-            <Truck className="w-4 h-4" />
-            Medicine Delivery
-          </Button>
-        </div>
+        {/* Removed quick action chips; available in sidebar */}
       </div>
 
       {/* Scan Options Dialog */}
