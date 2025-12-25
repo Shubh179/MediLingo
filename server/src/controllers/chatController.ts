@@ -4,7 +4,7 @@ import { GEMINI_API_KEY, GEMINI_MODEL } from '../config/env';
 import { MedicalHistory } from '../models/MedicalHistory';
 import { MedicalKnowledge } from '../models/MedicalKnowledge';
 
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY!);
 
 const candidateModels = [
   GEMINI_MODEL,

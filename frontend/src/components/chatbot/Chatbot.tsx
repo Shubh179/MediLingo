@@ -10,6 +10,7 @@ interface ChatbotProps {
   isOpen: boolean;
   onClose: () => void;
   initialMessage?: string | null;
+  autoStartVoice?: boolean;
 }
 
 const mockChatHistory: ChatHistory[] = [
@@ -60,7 +61,7 @@ const getMedicationResponse = (input: string): string => {
   return 'I\'m here to help with your medication questions!\n\nI can assist with:\n• Dosage and how much to take\n• When and how often to take your medicine\n• Food and drink interactions\n• Managing side effects\n• Missed dose instructions\n• Drug interactions\n• General medication safety\n• Finding nearby pharmacies\n\nPlease provide more details about your question, and I\'ll give you specific information. For serious concerns, always consult your doctor or pharmacist.';
 };
 
-const Chatbot = ({ isOpen, onClose, initialMessage }: ChatbotProps) => {
+const Chatbot = ({ isOpen, onClose, initialMessage, autoStartVoice }: ChatbotProps) => {
   const { user } = useAuth();
   const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5001';
   const [chats, setChats] = useState<Record<string, Message[]>>({
@@ -189,6 +190,68 @@ const Chatbot = ({ isOpen, onClose, initialMessage }: ChatbotProps) => {
     }
   }, [activeChat, chatHistories]);
 
+  const handleVoiceBlob = useCallback(async (blob: Blob) => {
+    setIsLoading(true);
+    try {
+      const form = new FormData();
+      form.append('audio', blob, `voice-${Date.now()}.webm`);
+      if (user?.id) form.append('userId', String(user.id));
+
+      const resp = await fetch(`${API_BASE_URL}/api/voice/chat`, {
+        method: 'POST',
+        body: form,
+        credentials: 'include',
+      });
+
+      if (!resp.ok) {
+        throw new Error(`Voice chat failed: ${resp.status}`);
+      }
+
+      const data = await resp.json();
+      const transcript: string = data?.transcript || 'Voice message';
+      const replyText: string = data?.replyText || '';
+      const audioB64: string | undefined = data?.replyAudioBase64;
+      const audioMime: string | undefined = data?.replyAudioMimeType;
+
+      const userMessage: Message = {
+        id: `msg-${Date.now()}`,
+        role: 'user',
+        content: transcript,
+      };
+
+      const botMessage: Message = {
+        id: `msg-${Date.now() + 1}`,
+        role: 'bot',
+        content: replyText || getMedicationResponse(transcript),
+      };
+
+      setChats((prev) => ({
+        ...prev,
+        [activeChat]: [...(prev[activeChat] || []), userMessage, botMessage],
+      }));
+
+      // Play TTS if present
+      if (audioB64 && audioMime) {
+        try {
+          const audio = new Audio(`data:${audioMime};base64,${audioB64}`);
+          audio.play().catch(() => {});
+        } catch {}
+      }
+    } catch (e) {
+      const botMessage: Message = {
+        id: `msg-${Date.now() + 1}`,
+        role: 'bot',
+        content: 'Voice processing failed. Please try again or type your question.',
+      };
+      setChats((prev) => ({
+        ...prev,
+        [activeChat]: [...(prev[activeChat] || []), botMessage],
+      }));
+    } finally {
+      setIsLoading(false);
+    }
+  }, [activeChat, API_BASE_URL, user?.id]);
+
   if (!isOpen) return null;
 
   return (
@@ -216,7 +279,7 @@ const Chatbot = ({ isOpen, onClose, initialMessage }: ChatbotProps) => {
         {/* Main Chat Area */}
         <div className="flex-1 flex flex-col">
           <ChatWindow messages={currentMessages} />
-          <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+          <ChatInput onSendMessage={handleSendMessage} onSendVoiceBlob={handleVoiceBlob} isLoading={isLoading} autoStartVoice={autoStartVoice} />
         </div>
       </div>
     </div>

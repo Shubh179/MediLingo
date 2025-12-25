@@ -1,4 +1,4 @@
-import { Camera, Sparkles, MessageCircle, Upload, Video } from "lucide-react";
+import { Camera, Sparkles, MessageCircle, Upload, Video, MapPin, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useState } from "react";
@@ -15,6 +15,8 @@ import {
 import Chatbot from "@/components/chatbot/Chatbot";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/components/ui/use-toast";
+import PharmacyFinder from "@/components/PharmacyFinder";
+import { HospitalFinder } from "@/components/HospitalFinder";
 
 interface HeroSectionProps {
   onScanClick: () => void;
@@ -27,6 +29,9 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
   const [showChatbot, setShowChatbot] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [chatInitialMessage, setChatInitialMessage] = useState<string | null>(null);
+  const [showHospitalDialog, setShowHospitalDialog] = useState(false);
+  const [showPharmacyDialog, setShowPharmacyDialog] = useState(false);
+  const [autoStartVoice, setAutoStartVoice] = useState(false);
   const { isAuthenticated } = useAuth();
 
   const ensureLoggedIn = () => {
@@ -73,35 +78,14 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
     setShowChatbot(true);
   };
 
-  const handleAIRecognition = () => {
+  const openHospitalFinder = () => {
     if (!ensureLoggedIn()) return;
-    setChatInitialMessage(null);
-    setShowChatbot(true);
+    setShowHospitalDialog(true);
   };
 
-  const handlePharmacyFinder = () => {
-    // Request location permission
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          if (!ensureLoggedIn()) return;
-          const { latitude, longitude } = position.coords;
-          setChatInitialMessage(`Find pharmacies near my location (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`);
-          setShowChatbot(true);
-        },
-        (error) => {
-          if (!ensureLoggedIn()) return;
-          // Handle error - still open chatbot with general pharmacy request
-          setChatInitialMessage('Find nearby pharmacies');
-          setShowChatbot(true);
-        }
-      );
-    } else {
-      // Geolocation not supported
-      if (!ensureLoggedIn()) return;
-      setChatInitialMessage('Find nearby pharmacies');
-      setShowChatbot(true);
-    }
+  const openPharmacyFinder = () => {
+    if (!ensureLoggedIn()) return;
+    setShowPharmacyDialog(true);
   };
 
   return (
@@ -135,30 +119,56 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
               setChatInitialMessage(null);
               setShowChatbot(true);
             }}
-            className="flex items-center gap-3 px-4 py-2.5 bg-white border-2 border-gray-200 rounded-lg cursor-text hover:border-primary/40 transition-all"
+            className="flex items-center gap-3 px-4 py-2.5 bg-white border-2 border-gray-200 rounded-full cursor-text hover:border-primary/40 transition-all"
           >
             <MessageCircle className="w-4 h-4 text-gray-400" />
-            <span className="text-gray-400 text-sm">{t.hero.chatPlaceholder}</span>
+            <span className="text-gray-400 text-sm flex-1">{t.hero.chatPlaceholder}</span>
+            {/* Voice emoji button that opens chat */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!ensureLoggedIn()) return;
+                setChatInitialMessage(null);
+                setAutoStartVoice(true);
+                setShowChatbot(true);
+              }}
+              aria-label="Voice chat"
+              className="ml-auto inline-flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 text-base hover:scale-110 transition-transform"
+            >
+              <span role="img" aria-label="microphone">🎤</span>
+            </button>
           </div>
         </div>
 
-        {/* Features Pills */}
+        {/* Quick Action Buttons */}
         <div className="flex flex-wrap justify-center gap-2 fade-up mt-2 md:mt-3" style={{ animationDelay: "0.2s" }}>
-          {[
-            { icon: "📷", text: t.hero.instantScan, clickable: true, handler: handleScanClick },
-            { icon: "🔍", text: t.hero.aiRecognition, clickable: true, handler: handleAIRecognition },
-            { icon: "💊", text: t.hero.pharmacyFinder, clickable: true, handler: handlePharmacyFinder },
-          ].map((feature, i) => (
-            <div 
-              key={i} 
-              onClick={feature.clickable ? feature.handler : undefined}
-              className={`px-4 py-2 rounded-lg bg-white border-2 border-gray-200 backdrop-blur-sm text-xs md:text-sm text-gray-700 hover:border-primary/40 transition-all ${
-                feature.clickable ? 'cursor-pointer hover:bg-gray-50 hover:scale-105' : ''
-              }`}
-            >
-              <span className="mr-1">{feature.icon}</span>{feature.text}
-            </div>
-          ))}
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-2 px-3 py-2 text-sm rounded-full border border-primary/70 text-primary bg-white shadow-sm hover:bg-primary/10"
+            onClick={handleScanClick}
+          >
+            <Camera className="w-4 h-4" />
+            {t.hero.scanButton}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-2 px-3 py-2 text-sm rounded-full border border-primary/70 text-primary bg-white shadow-sm hover:bg-primary/10"
+            onClick={openHospitalFinder}
+          >
+            <Building2 className="w-4 h-4" />
+            {t.nav.nearbyHospitals}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-2 px-3 py-2 text-sm rounded-full border border-primary/70 text-primary bg-white shadow-sm hover:bg-primary/10"
+            onClick={openPharmacyFinder}
+          >
+            <MapPin className="w-4 h-4" />
+            {t.nav.nearbyPharmacies}
+          </Button>
         </div>
       </div>
 
@@ -197,14 +207,42 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
         </DialogContent>
       </Dialog>
 
+      {/* Nearby Hospital Dialog */}
+      <Dialog open={showHospitalDialog} onOpenChange={setShowHospitalDialog}>
+        <DialogContent className="sm:max-w-[480px]">
+          <DialogHeader>
+            <DialogTitle>{t.nav.nearbyHospitals}</DialogTitle>
+            <DialogDescription>
+              {t.common.findNearby} {t.common.within1_5km}
+            </DialogDescription>
+          </DialogHeader>
+          <HospitalFinder />
+        </DialogContent>
+      </Dialog>
+
+      {/* Nearby Pharmacy Dialog */}
+      <Dialog open={showPharmacyDialog} onOpenChange={setShowPharmacyDialog}>
+        <DialogContent className="sm:max-w-[480px]">
+          <DialogHeader>
+            <DialogTitle>{t.nav.nearbyPharmacies}</DialogTitle>
+            <DialogDescription>
+              {t.common.findNearby} {t.common.within1_5km}
+            </DialogDescription>
+          </DialogHeader>
+          <PharmacyFinder />
+        </DialogContent>
+      </Dialog>
+
       {/* Chatbot Modal */}
       <Chatbot 
         isOpen={showChatbot} 
         onClose={() => {
           setShowChatbot(false);
           setChatInitialMessage(null);
+          setAutoStartVoice(false);
         }} 
         initialMessage={chatInitialMessage}
+        autoStartVoice={autoStartVoice}
       />
 
       {/* Camera Capture Modal */}

@@ -15,9 +15,6 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { usePlan } from "@/contexts/PlanContext";
 import LanguageSwitcher from "./LanguageSwitcher";
-import { MapPin, Building2 } from "lucide-react";
-import PharmacyFinder from "@/components/PharmacyFinder";
-import { HospitalFinder } from "@/components/HospitalFinder";
 
 const GlassNav = () => {
   const { t } = useLanguage();
@@ -217,13 +214,16 @@ const GlassNav = () => {
     try {
       const amount = target === "premium" ? 299 : 599;
       
+      // Get Razorpay key from environment or use fallback
+      const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_RtYUA2drSIhQYW";
+      
       // Load Razorpay script
       const script = document.createElement("script");
       script.src = "https://checkout.razorpay.com/v1/checkout.js";
       script.async = true;
       script.onload = () => {
         const options = {
-          key: "rzp_test_RtYUA2drSIhQYW", // Razorpay test key
+          key: razorpayKey, // Use environment variable
           amount: amount * 100, // Amount in paise
           currency: "INR",
           name: "MediLingo",
@@ -281,43 +281,6 @@ const GlassNav = () => {
           {/* Language Switcher */}
           <LanguageSwitcher />
 
-          {/* Nearby Hospital */}
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2">
-                <Building2 className="w-4 h-4" />
-                {t.nav.nearbyHospitals}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[480px]">
-              <DialogHeader>
-                <DialogTitle>{t.nav.nearbyHospitals}</DialogTitle>
-                <DialogDescription>
-                  {t.common.findNearby} {t.common.within1_5km}
-                </DialogDescription>
-              </DialogHeader>
-              <HospitalFinder />
-            </DialogContent>
-          </Dialog>
-
-          {/* Nearby Pharmacy */}
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2">
-                <MapPin className="w-4 h-4" />
-                {t.nav.nearbyPharmacies}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[480px]">
-              <DialogHeader>
-                <DialogTitle>{t.nav.nearbyPharmacies}</DialogTitle>
-                <DialogDescription>
-                  {t.common.findNearby} {t.common.within1_5km}
-                </DialogDescription>
-              </DialogHeader>
-              <PharmacyFinder />
-            </DialogContent>
-          </Dialog>
           {/* Login/Logout Button */}
           {isAuthenticated ? (
             <Button

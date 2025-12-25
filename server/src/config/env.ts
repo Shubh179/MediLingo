@@ -25,6 +25,9 @@ if (envPath) {
 // Accept either GEMINI_API_KEY or GOOGLE_API_KEY to avoid naming drift
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 
+// Optional OpenAI key for TTS
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
 // Allow overriding Gemini model; default to gemini-2.5-flash since you have access
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 
@@ -55,6 +58,10 @@ const PORT = process.env.PORT || 5000;
 // Frontend URL for CORS
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
+// Razorpay Configuration
+const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
+
 // Validation
 if (!SESSION_SECRET) {
   throw new Error('SESSION_SECRET is not set in environment variables.');
@@ -71,6 +78,7 @@ if (!MONGODB_URI) {
 export { 
   GEMINI_API_KEY, 
   GEMINI_MODEL,
+  OPENAI_API_KEY,
   SESSION_SECRET,
   NODE_ENV,
   EMAIL_USER,
@@ -79,5 +87,7 @@ export {
   EMAIL_PORT,
   MONGODB_URI,
   PORT,
-  FRONTEND_URL
+  FRONTEND_URL,
+  RAZORPAY_KEY_ID,
+  RAZORPAY_KEY_SECRET
 };

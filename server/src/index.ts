@@ -5,7 +5,9 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import connectDB from './config/db';
 import prescriptionRoutes from './routes/prescriptionRoutes';
+import voiceRoutes from './routes/voiceRoutes';
 import authRoutes from './routes/authRoutes';
+import paymentRoutes from './routes/paymentRoutes';
 import { SESSION_SECRET, NODE_ENV, FRONTEND_URL, PORT } from './config/env';
 
 // Initialize configuration
@@ -31,7 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Middleware - Sessions
 app.use(session({
-  secret: SESSION_SECRET,
+  secret: SESSION_SECRET!,
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -45,7 +47,9 @@ app.use(session({
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/prescriptions', prescriptionRoutes); 
+app.use('/api/prescriptions', prescriptionRoutes);
+app.use('/api/payment', paymentRoutes);
+app.use('/api/voice', voiceRoutes);
 
 // Basic Health Check Route
 app.get('/', (req: Request, res: Response) => {

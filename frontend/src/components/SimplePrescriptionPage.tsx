@@ -21,7 +21,7 @@ interface SimplePrescriptionPageProps {
 const SimplePrescriptionPage = ({ onBack, prescriptionText, prescriptionImage }: SimplePrescriptionPageProps) => {
   const { addMedicines, medicines } = useMedicineHistory();
   const { user } = useAuth();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5001';
 
   const [extractedText] = useState<string | null>(prescriptionText || null);
@@ -336,11 +336,11 @@ const SimplePrescriptionPage = ({ onBack, prescriptionText, prescriptionImage }:
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="sm" onClick={onBack} className="hover:bg-primary/10 transition-all">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
+              {t.prescription.back}
             </Button>
             <div>
-              <h1 className="text-3xl font-black text-gray-900 gradient-text">Prescription Analysis</h1>
-              <p className="text-sm text-gray-600">AI-powered medicine management</p>
+              <h1 className="text-3xl font-black text-gray-900 gradient-text">{t.prescription.title}</h1>
+              <p className="text-sm text-gray-600">{t.prescription.subtitle}</p>
             </div>
           </div>
           
@@ -353,7 +353,7 @@ const SimplePrescriptionPage = ({ onBack, prescriptionText, prescriptionImage }:
                 className="premium-shadow hover:scale-105 transition-all"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Add Reminder
+                {t.prescription.addReminder}
               </Button>
             </div>
           )}
@@ -368,7 +368,7 @@ const SimplePrescriptionPage = ({ onBack, prescriptionText, prescriptionImage }:
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <FileText className="w-5 h-5 text-primary" />
-                    Uploaded Prescription
+                    {t.prescription.uploadedPrescription}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -389,15 +389,15 @@ const SimplePrescriptionPage = ({ onBack, prescriptionText, prescriptionImage }:
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Brain className="w-5 h-5 text-primary" />
-                  AI Extracted Text
+                  {t.prescription.aiExtractedText}
                 </CardTitle>
                 {prescriptionText && (
                   <div className="ml-auto flex items-center gap-2">
                     <Button variant="outline" size="sm" onClick={() => scrollAreaTop(extractedRef)}>
-                      Top
+                      {t.prescription.top}
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => scrollAreaBottom(extractedRef)}>
-                      Bottom
+                      {t.prescription.bottom}
                     </Button>
                   </div>
                 )}
@@ -464,10 +464,10 @@ const SimplePrescriptionPage = ({ onBack, prescriptionText, prescriptionImage }:
             {medicines.length > 0 && (
               <Card>
                 <CardHeader className="flex flex-row items-center">
-                  <CardTitle className="text-lg">Detected Medicines</CardTitle>
+                  <CardTitle className="text-lg">{t.prescription.detectedMedicines}</CardTitle>
                   <div className="ml-auto flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={() => scrollAreaTop(medsRef)}>Top</Button>
-                    <Button variant="outline" size="sm" onClick={() => scrollAreaBottom(medsRef)}>Bottom</Button>
+                    <Button variant="outline" size="sm" onClick={() => scrollAreaTop(medsRef)}>{t.prescription.top}</Button>
+                    <Button variant="outline" size="sm" onClick={() => scrollAreaBottom(medsRef)}>{t.prescription.bottom}</Button>
                   </div>
                 </CardHeader>
                 <CardContent>

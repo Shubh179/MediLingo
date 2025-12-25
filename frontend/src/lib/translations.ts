@@ -1,4 +1,4 @@
-export type Language = 'en' | 'hi' | 'mr' | 'bn';
+export type Language = 'en' | 'hi' | 'mr' | 'gu';
 
 export interface Translations {
   nav: {
@@ -63,6 +63,17 @@ export interface Translations {
     useCamera: string;
     uploadFromGallery: string;
     chooseUploadMethod: string;
+  };
+  prescription: {
+    title: string;
+    subtitle: string;
+    uploadedPrescription: string;
+    detectedMedicines: string;
+    aiExtractedText: string;
+    addReminder: string;
+    top: string;
+    bottom: string;
+    back: string;
   };
 }
 
@@ -131,6 +142,17 @@ export const translations: Record<Language, Translations> = {
       uploadFromGallery: 'Upload from Gallery',
       chooseUploadMethod: "Choose how you'd like to upload your prescription",
     },
+    prescription: {
+      title: 'Prescription Analysis',
+      subtitle: 'AI-powered medicine management',
+      uploadedPrescription: 'Uploaded Prescription',
+      detectedMedicines: 'Detected Medicines',
+      aiExtractedText: 'AI Extracted Text',
+      addReminder: 'Add Reminder',
+      top: 'Top',
+      bottom: 'Bottom',
+      back: 'Back',
+    },
   },
   hi: {
     nav: {
@@ -195,6 +217,17 @@ export const translations: Record<Language, Translations> = {
       useCamera: 'कैमरा उपयोग करें',
       uploadFromGallery: 'गैलरी से अपलोड',
       chooseUploadMethod: 'अपलोड करने का तरीका चुनें',
+    },
+    prescription: {
+      title: 'पर्चा विश्लेषण',
+      subtitle: 'एआई-संचालित दवा प्रबंधन',
+      uploadedPrescription: 'अपलोड किया गया पर्चा',
+      detectedMedicines: 'पहचानी गई दवाएं',
+      aiExtractedText: 'एआई निकाला गया पाठ',
+      addReminder: 'अनुस्मारक जोड़ें',
+      top: 'शीर्ष',
+      bottom: 'नीचे',
+      back: 'वापस',
     },
   },
   mr: {
@@ -261,70 +294,92 @@ export const translations: Record<Language, Translations> = {
       uploadFromGallery: 'गॅलरीतून अपलोड',
       chooseUploadMethod: 'अपलोड कसे कराल ते निवडा',
     },
+    prescription: {
+      title: 'प्रिस्क्रिप्शन विश्लेषण',
+      subtitle: 'एआय-आधारित औषध व्यवस्थापन',
+      uploadedPrescription: 'अपलोड केलेले प्रिस्क्रिप्शन',
+      detectedMedicines: 'ओळखली गेलेली औषधे',
+      aiExtractedText: 'एआय काढलेला मजकूर',
+      addReminder: 'स्मरणपत्र जोडा',
+      top: 'वर',
+      bottom: 'खाली',
+      back: 'मागे',
+    },
   },
-  bn: {
+  gu: {
     nav: {
-      appName: 'মেডিলিংগো',
-      login: 'লগইন',
-      logout: 'লগআউট',
-      nearbyHospitals: 'নিকটবর্তী হাসপাতাল',
-      nearbyPharmacies: 'নিকটবর্তী ফার্মেসি',
+      appName: 'મેડીલિંગો',
+      login: 'લૉગિન',
+      logout: 'લૉગઆઉટ',
+      nearbyHospitals: 'નજીકની હોસ્પિટલો',
+      nearbyPharmacies: 'નજીકની ફાર્મસી',
     },
     hero: {
-      trustBadge: '৫০,০০০+ পরিবারের ভরসা',
-      title1: 'আপনার ওষুধ',
-      title2: 'বোঝুন',
-      title3: 'সেকেন্ডে',
-      subtitle: 'শুধু একটি ছবি তুলুন। আমরা সহজ ভাষায় ওষুধের নির্দেশনা বুঝিয়ে দেব।',
-      scanButton: 'প্রেসক্রিপশন স্ক্যান করুন',
-      noAccount: 'অ্যাকাউন্টের প্রয়োজন নেই • ফ্রি',
-      headline: 'আপনার স্বাস্থ্য, সহজভাবে',
-      dropOrScan: 'প্রেসক্রিপশন ড্রপ করুন বা স্ক্যান করুন',
-      uploadExplain: 'প্রেসক্রিপশনের ছবি তুলুন বা ইমেজ আপলোড করুন',
-      takePhotoBtn: 'ছবি তুলুন',
-      uploadFileBtn: 'ফাইল আপলোড করুন',
-      chatPlaceholder: 'আপনার প্রেসক্রিপশন নিয়ে যেকোন প্রশ্ন করুন...',
-      instantScan: 'ইনস্ট্যান্ট স্ক্যান',
-      aiRecognition: 'এআই রিকগনিশন',
-      pharmacyFinder: 'ফার্মেসি খুঁজুন',
-      hospitalFinder: 'হাসপাতাল খুঁজুন',
+      trustBadge: '50,000+ પરિવારો દ્વારા વિશ્વસનીય',
+      title1: 'તમારી દવાઓને',
+      title2: 'સમજો',
+      title3: 'સેકન્ડમાં',
+      subtitle: 'ફક્ત એક ફોટો લો. અમે તમારી દવાઓ સરળ શબ્દોમાં સમજાવીશું.',
+      scanButton: 'પ્રિસ્ક્રિપ્શન સ્કેન કરો',
+      noAccount: 'એકાઉન્ટની જરૂર નથી • મફત',
+      headline: 'તમારું સ્વાસ્થ્ય, સમજાવેલું',
+      dropOrScan: 'પ્રિસ્ક્રિપ્શન ડ્રોપ કરો અથવા સ્કેન કરો',
+      uploadExplain: 'તમારા પ્રિસ્ક્રિપ્શનનો ફોટો લો અથવા છબી અપલોડ કરો',
+      takePhotoBtn: 'ફોટો લો',
+      uploadFileBtn: 'ફાઇલ અપલોડ કરો',
+      chatPlaceholder: 'તમારા પ્રિસ્ક્રિપ્શન વિશે કંઈપણ પૂછો...',
+      instantScan: 'તરત જ સ્કેન',
+      aiRecognition: 'AI ઓળખ',
+      pharmacyFinder: 'ફાર્મસી શોધો',
+      hospitalFinder: 'હોસ્પિટલ શોધો',
     },
     upload: {
-      title: 'প্রেসক্রিপশন আপলোড করুন',
-      subtitle: 'আপনার প্রেসক্রিপশনের একটি পরিষ্কার ছবি তুলুন',
-      dragDrop: 'ছবিটি এখানে ড্র্যাগ ও ড্রপ করুন',
-      or: 'অথবা',
-      takePhoto: 'ছবি তুলুন',
-      chooseFile: 'গ্যালারি থেকে বাছাই করুন',
-      supportedFormats: 'JPG, PNG, PDF সমর্থিত',
-      processing: 'আপনার প্রেসক্রিপশন পড়া হচ্ছে...',
-      success: 'প্রেসক্রিপশন পাওয়া গেছে',
-      cancel: 'বাতিল',
+      title: 'પ્રિસ્ક્રિપ્શન અપલોડ કરો',
+      subtitle: 'તમારા પ્રિસ્ક્રિપ્શનનો સ્પષ્ટ ફોટો લો',
+      dragDrop: 'તમારી છબી અહીં ખેંચો અને મૂકો',
+      or: 'અથવા',
+      takePhoto: 'ફોટો લો',
+      chooseFile: 'ગેલેરીમાંથી પસંદ કરો',
+      supportedFormats: 'JPG, PNG, PDF સપોર્ટેડ',
+      processing: 'તમારું પ્રિસ્ક્રિપ્શન વાંચી રહ્યા છીએ...',
+      success: 'પ્રિસ્ક્રિપ્શન પ્રાપ્ત થયું',
+      cancel: 'રદ કરો',
     },
     dashboard: {
-      title: 'আপনার ওষুধ',
-      todaySchedule: 'আজকের সূচি',
-      dailyProgress: 'দৈনিক অগ্রগতি',
-      taken: 'খাওয়া হয়েছে',
-      of: 'এর',
-      morning: 'সকাল',
-      afternoon: 'দুপুর',
-      night: 'রাত',
-      markAsTaken: 'খাওয়া হয়েছে হিসেবে চিহ্নিত করুন',
-      takenLabel: 'খাওয়া',
-      missedDose: 'ডোজ মিস হয়েছে - এখন নিন',
-      listenInstructions: 'নির্দেশনা শুনুন',
-      noMedicines: 'কোনো ওষুধ নির্ধারিত নেই',
+      title: 'તમારી દવાઓ',
+      todaySchedule: 'આજનું શેડ્યૂલ',
+      dailyProgress: 'દૈનિક પ્રગતિ',
+      taken: 'લીધી',
+      of: 'માંથી',
+      morning: 'સવારે',
+      afternoon: 'બપોરે',
+      night: 'રાત્રે',
+      markAsTaken: 'લીધી તરીકે ચિહ્નિત કરો',
+      takenLabel: 'લીધી',
+      missedDose: 'ડોઝ ચૂકી ગઈ - હમણાં લો',
+      listenInstructions: 'સૂચનાઓ સાંભળો',
+      noMedicines: 'કોઈ દવાઓ શેડ્યૂલ નથી',
     },
     common: {
-      back: 'ফিরে যান',
-      notifications: 'বিজ্ঞপ্তি',
-      findNearby: 'কাছাকাছি খুঁজুন',
-      findNearbyShort: 'কাছাকাছি',
-      within1_5km: '(১.৫কিমি)',
-      useCamera: 'ক্যামেরা ব্যবহার করুন',
-      uploadFromGallery: 'গ্যালারি থেকে আপলোড',
-      chooseUploadMethod: 'আপলোড করার পদ্ধতি বাছাই করুন',
+      back: 'પાછા જાઓ',
+      notifications: 'સૂચનાઓ',
+      findNearby: 'નજીકમાં શોધો',
+      findNearbyShort: 'નજીકમાં',
+      within1_5km: '(1.5કિમી)',
+      useCamera: 'કેમેરા વાપરો',
+      uploadFromGallery: 'ગેલેરીમાંથી અપલોડ',
+      chooseUploadMethod: 'તમારું પ્રિસ્ક્રિપ્શન કેવી રીતે અપલોડ કરવું તે પસંદ કરો',
+    },
+    prescription: {
+      title: 'પ્રિસ્ક્રિપ્શન વિશ્લેષણ',
+      subtitle: 'AI-સંચાલિત દવા વ્યવસ્થાપન',
+      uploadedPrescription: 'અપલોડ કરેલું પ્રિસ્ક્રિપ્શન',
+      detectedMedicines: 'શોધાયેલી દવાઓ',
+      aiExtractedText: 'AI કાઢેલો ટેક્સ્ટ',
+      addReminder: 'રિમાઇન્ડર ઉમેરો',
+      top: 'ઉપર',
+      bottom: 'નીચે',
+      back: 'પાછા',
     },
   },
 };
@@ -333,5 +388,5 @@ export const languageNames: Record<Language, string> = {
   en: 'English',
   hi: 'हिंदी',
   mr: 'मराठी',
-  bn: 'বাংলা',
+  gu: 'ગુજરાતી',
 };

@@ -157,32 +157,46 @@ export const reminderService = {
       return;
     }
 
+    // Store reminder ID for the interval tracking
+    const intervalStorageKey = `reminder_interval_${reminder.id}`;
+    const existingInterval = localStorage.getItem(intervalStorageKey);
+    if (existingInterval) {
+      clearInterval(parseInt(existingInterval));
+    }
+
     // Check and notify at each scheduled time
     const checkAndNotify = () => {
       const now = new Date();
       const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
       reminder.times.forEach(time => {
-        if (currentTime === time) {
+        if (currentTime === time && reminder.isActive) {
           reminderService.sendNotification(
             `💊 Time for ${reminder.medicineName}`,
             {
               body: `Take ${reminder.dosage}`,
               tag: `reminder_${reminder.id}`,
+              requireInteraction: true, // Keep notification visible
             }
           );
         }
       });
     };
 
-    // Check every minute
-    const interval = setInterval(() => {
-      if (reminder.isActive) {
+    // Check every minute for reminder time
+    const interval = window.setInterval(() => {
+      const reminders = reminderService.getReminders();
+      const currentReminder = reminders.find(r => r.id === reminder.id);
+      if (currentReminder && currentReminder.isActive) {
         checkAndNotify();
       } else {
         clearInterval(interval);
+        localStorage.removeItem(intervalStorageKey);
       }
     }, 60000); // Check every minute
+
+    // Save interval ID for cleanup
+    localStorage.setItem(intervalStorageKey, String(interval));
   },
 
   /**

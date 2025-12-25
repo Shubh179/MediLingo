@@ -12,7 +12,7 @@ import {
 const LanguageSwitcher = () => {
   const { language, setLanguage } = useLanguage();
   // Always expose four languages as requested
-  const languages: Language[] = ['en', 'hi', 'mr', 'bn'];
+  const languages: Language[] = ['en', 'hi', 'mr', 'gu'];
 
   return (
     <DropdownMenu>
