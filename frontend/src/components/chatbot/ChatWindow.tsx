@@ -1,5 +1,6 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useEffect, useRef } from 'react';
+import { AlertCircle, AlertTriangle } from 'lucide-react';
 import ChatMessage from './ChatMessage';
 
 export interface Message {
@@ -7,14 +8,24 @@ export interface Message {
   role: 'user' | 'bot';
   content: string;
   isLoading?: boolean;
+  severity?: {
+    score: number;
+    level: string;
+    isEmergency: boolean;
+    disease: string;
+  };
 }
 
 interface ChatWindowProps {
   messages: Message[];
+  onAmbulanceClick?: () => void;
 }
 
-const ChatWindow = ({ messages }: ChatWindowProps) => {
+const ChatWindow = ({ messages, onAmbulanceClick }: ChatWindowProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  
+  // Find the most recent emergency message
+  const emergencyMessage = messages.find(m => m.severity?.isEmergency === true);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -49,8 +60,36 @@ const ChatWindow = ({ messages }: ChatWindowProps) => {
                 role={message.role}
                 content={message.content}
                 isLoading={message.isLoading}
+                severity={message.severity}
               />
             ))}
+            
+            {/* Emergency Alert Banner */}
+            {emergencyMessage && (
+              <div className="mx-4 mb-4 p-4 bg-red-50 border-l-4 border-red-500 rounded">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-red-900 mb-1">
+                      🚨 High Severity: {emergencyMessage.severity?.disease}
+                    </h3>
+                    <p className="text-sm text-red-800 mb-3">
+                      Severity Score: {emergencyMessage.severity?.score}/10 ({emergencyMessage.severity?.level})
+                    </p>
+                    <p className="text-sm text-red-800 mb-4">
+                      This condition requires immediate medical attention. Please seek emergency care or call an ambulance.
+                    </p>
+                    <button
+                      onClick={onAmbulanceClick}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition-colors"
+                    >
+                      🚑 Call Ambulance
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div ref={scrollRef} />
           </div>
         )}

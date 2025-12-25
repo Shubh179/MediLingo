@@ -1,10 +1,16 @@
-import { MessageCircle, User } from 'lucide-react';
+import { MessageCircle, User, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ChatMessageProps {
   role: 'user' | 'bot';
   content: string;
   isLoading?: boolean;
+  severity?: {
+    score: number;
+    level: string;
+    isEmergency: boolean;
+    disease: string;
+  };
 }
 
 const parseMarkdown = (text: string) => {
@@ -19,7 +25,7 @@ const parseMarkdown = (text: string) => {
   return text;
 };
 
-const ChatMessage = ({ role, content, isLoading }: ChatMessageProps) => {
+const ChatMessage = ({ role, content, isLoading, severity }: ChatMessageProps) => {
   const isUser = role === 'user';
   const parsedContent = parseMarkdown(content);
 
@@ -59,6 +65,23 @@ const ChatMessage = ({ role, content, isLoading }: ChatMessageProps) => {
             />
           )}
         </div>
+
+        {/* Severity Badge */}
+        {severity && !isUser && (
+          <div className={cn(
+            "mt-2 px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-2",
+            severity.isEmergency
+              ? "bg-red-100 text-red-700"
+              : severity.level === 'High'
+              ? "bg-orange-100 text-orange-700"
+              : severity.level === 'Moderate'
+              ? "bg-yellow-100 text-yellow-700"
+              : "bg-green-100 text-green-700"
+          )}>
+            {severity.isEmergency && <AlertTriangle className="w-4 h-4" />}
+            <span>🏥 {severity.disease} - Severity: {severity.score}/10 ({severity.level})</span>
+          </div>
+        )}
       </div>
 
       {isUser && (

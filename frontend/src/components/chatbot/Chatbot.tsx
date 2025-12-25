@@ -120,6 +120,12 @@ const Chatbot = ({ isOpen, onClose, initialMessage, autoStartVoice }: ChatbotPro
     }
   };
 
+  const handleAmbulanceClick = () => {
+    // Call emergency services
+    // In a real app, this could integrate with actual emergency services
+    alert('🚑 EMERGENCY ALERT!\n\nCalling local emergency services...\n\nPlease ensure you are in a safe location and an ambulance is being dispatched to your area.\n\nEmergency Number: 911 (or your local emergency number)');
+  };
+
   const handleSendMessage = useCallback(async (message: string) => {
     // Add user message
     const userMessage: Message = {
@@ -144,9 +150,12 @@ const Chatbot = ({ isOpen, onClose, initialMessage, autoStartVoice }: ChatbotPro
       });
 
       let replyText = '';
+      let severity = undefined;
+      
       if (resp.ok) {
         const data = await resp.json();
         replyText = data?.reply || '';
+        severity = data?.severity; // Extract severity data from response
       } else {
         // Fallback to local response if API returns error
         replyText = getMedicationResponse(message);
@@ -156,6 +165,7 @@ const Chatbot = ({ isOpen, onClose, initialMessage, autoStartVoice }: ChatbotPro
         id: `msg-${Date.now() + 1}`,
         role: 'bot',
         content: replyText || getMedicationResponse(message),
+        severity, // Add severity to bot message
       };
 
       setChats((prev) => ({
@@ -278,7 +288,7 @@ const Chatbot = ({ isOpen, onClose, initialMessage, autoStartVoice }: ChatbotPro
 
         {/* Main Chat Area */}
         <div className="flex-1 flex flex-col">
-          <ChatWindow messages={currentMessages} />
+          <ChatWindow messages={currentMessages} onAmbulanceClick={handleAmbulanceClick} />
           <ChatInput onSendMessage={handleSendMessage} onSendVoiceBlob={handleVoiceBlob} isLoading={isLoading} autoStartVoice={autoStartVoice} />
         </div>
       </div>

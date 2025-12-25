@@ -8,6 +8,7 @@ import prescriptionRoutes from './routes/prescriptionRoutes';
 import voiceRoutes from './routes/voiceRoutes';
 import authRoutes from './routes/authRoutes';
 import paymentRoutes from './routes/paymentRoutes';
+import chatRoutes from './routes/chatRoutes';
 import { SESSION_SECRET, NODE_ENV, FRONTEND_URL, PORT } from './config/env';
 
 // Initialize configuration
@@ -50,12 +51,13 @@ app.use('/api/auth', authRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/voice', voiceRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Basic Health Check Route
 app.get('/', (req: Request, res: Response) => {
   res.send('MediLingo API is running...');
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running in ${NODE_ENV} mode on port ${PORT}`);
 });

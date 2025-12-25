@@ -3,8 +3,11 @@ import { GoogleGenerativeAI, TaskType } from '@google/generative-ai';
 import { GEMINI_API_KEY, GEMINI_MODEL } from '../config/env';
 import { MedicalHistory } from '../models/MedicalHistory';
 import { MedicalKnowledge } from '../models/MedicalKnowledge';
+import { getSeverityScore, getSeverityLevel, isEmergency } from '../utils/severityScorer';
 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY!);
+
+const EMERGENCY_THRESHOLD = 7; // Show ambulance button if severity >= 7
 
 const candidateModels = [
   GEMINI_MODEL,
@@ -24,7 +27,8 @@ const isNotFound = (err: unknown) => {
 const ADVISORY_KEYWORDS = [
   'suggest', 'advice', 'recommend', 'remedy', 'treatment', 'cure',
   'help', 'solution', 'what should', 'how to treat', 'manage',
-  'prevent', 'relief', 'medication for'
+  'prevent', 'relief', 'medication for', 'having', 'suffer', 'have',
+  'experiencing', 'symptoms of', 'diagnosed', 'pain', 'ache', 'trouble'
 ];
 
 // Disease keywords to detect medical queries
@@ -34,12 +38,24 @@ const DISEASE_KEYWORDS = [
   'allergy', 'pain', 'arthritis', 'thyroid', 'heart', 'kidney',
   'bronchitis', 'pharyngitis', 'meningitis', 'tuberculosis', 'eczema',
   'acid reflux', 'gastroenteritis', 'dehydration', 'insomnia', 'glaucoma',
-  'hernia', 'herniated disc', 'raynaud', 'lymph', 'electrolyte', 'infection'
+  'hernia', 'herniated disc', 'raynaud', 'lymph', 'electrolyte', 'infection',
+  'chest pain', 'stroke', 'pneumonia', 'cancer', 'anxiety', 'depression'
 ];
+
+const shouldUseSemanticSearch = (message: string): boolean => {
+  const lowerMessage = message.toLowerCase();
+  const hasAdvisoryKeyword = ADVISORY_KEYWORDS.some(kw => lowerMessage.includes(kw));
+  const hasDiseaseKeyword = DISEASE_KEYWORDS.some(kw => lowerMessage.includes(kw));
+  // Return true if message has advisory keywords OR disease keywords
+  // This catches queries like "suggest remedy for fever" or "I'm having chest pain"
+  return hasAdvisoryKeyword || hasDiseaseKeyword;
+};
 
 // Map common symptoms to actual database diseases
 const SYMPTOM_TO_DISEASE_MAP: { [key: string]: string } = {
   'fever': 'Meningitis',  // Fever can be serious, map to severe condition
+  'chest pain': 'Heart Disease',
+  'difficulty breathing': 'Respiratory Distress',
   'cold': 'Pharyngitis',
   'cough': 'Bronchitis',
   'headache': 'Migraine',
@@ -48,14 +64,9 @@ const SYMPTOM_TO_DISEASE_MAP: { [key: string]: string } = {
   'stomach': 'Gastroenteritis',
   'water': 'Dehydration',
   'sleep': 'Insomnia',
-  'itching': 'Eczema'
-};
-
-const shouldUseSemanticSearch = (message: string): boolean => {
-  const lowerMessage = message.toLowerCase();
-  const hasAdvisoryKeyword = ADVISORY_KEYWORDS.some(kw => lowerMessage.includes(kw));
-  const hasDiseaseKeyword = DISEASE_KEYWORDS.some(kw => lowerMessage.includes(kw));
-  return hasAdvisoryKeyword && hasDiseaseKeyword;
+  'itching': 'Eczema',
+  'stroke': 'Stroke',
+  'heart attack': 'Heart Disease'
 };
 
 // Extract disease name from message and try to find direct match
@@ -144,6 +155,32 @@ export const handleChat = async (req: Request, res: Response) => {
       
       if (searchResults && searchResults.length > 0) {
         const topMatch = searchResults[0] as any;
+        const detectedDisease = topMatch.disease;
+        const severityScore = getSeverityScore(detectedDisease);
+        const severityLevel = getSeverityLevel(severityScore);
+        const isEmergencySituation = isEmergency(severityScore, EMERGENCY_THRESHOLD);
+
+        // Update medical history with severity score
+        if (userId && history) {
+          const updatedMaxScore = Math.max(history.maxSeverityScore || 0, severityScore);
+          await MedicalHistory.updateOne(
+            { userId },
+            {
+              maxSeverityScore: updatedMaxScore,
+              lastSeverityScore: severityScore,
+              $push: {
+                severityHistory: {
+                  score: Math.round(severityScore * 10) / 10,
+                  detectedDisease,
+                  timestamp: new Date()
+                }
+              },
+              lastUpdated: new Date()
+            }
+          );
+          console.log(`📊 Severity tracking - Disease: ${detectedDisease}, Score: ${Math.round(severityScore * 10) / 10}/10, Level: ${severityLevel}`);
+        }
+
         const reply = `Based on your query about **${topMatch.disease}**, here's what I found:
 
 **Remedy:** ${topMatch.remedy}
@@ -156,7 +193,13 @@ ${topMatch.precautions?.map((p: string) => `• ${p}`).join('\n') || 'Consult a 
         return res.status(200).json({ 
           reply,
           searchResults: searchResults.slice(0, 3),
-          source: 'semantic_search'
+          source: 'semantic_search',
+          severity: {
+            score: Math.round(severityScore * 10) / 10,
+            level: severityLevel,
+            isEmergency: isEmergencySituation,
+            disease: detectedDisease
+          }
         });
       }
       // Fall through to Gemini if no results
@@ -171,15 +214,65 @@ ${topMatch.precautions?.map((p: string) => `• ${p}`).join('\n') || 'Consult a 
       Answer clearly and remind the user to consult a doctor for emergencies.
     `;
 
+    // Check for disease in user message even if not doing semantic search
+    let detectedDisease = null;
+    let severityScore = 0;
+    let severityLevel = 'Low';
+    let isEmergencySituation = false;
+
+    const lowerMessage = userMessage.toLowerCase();
+    for (const [symptom, disease] of Object.entries(SYMPTOM_TO_DISEASE_MAP)) {
+      if (lowerMessage.includes(symptom)) {
+        detectedDisease = disease;
+        severityScore = getSeverityScore(disease);
+        severityLevel = getSeverityLevel(severityScore);
+        isEmergencySituation = isEmergency(severityScore, EMERGENCY_THRESHOLD);
+        
+        // Update medical history with severity
+        if (userId && history) {
+          const updatedMaxScore = Math.max(history.maxSeverityScore || 0, severityScore);
+          await MedicalHistory.updateOne(
+            { userId },
+            {
+              maxSeverityScore: updatedMaxScore,
+              lastSeverityScore: severityScore,
+              $push: {
+                severityHistory: {
+                  score: Math.round(severityScore * 10) / 10,
+                  detectedDisease: disease,
+                  timestamp: new Date()
+                }
+              },
+              lastUpdated: new Date()
+            }
+          );
+          console.log(`📊 Severity detected in Gemini path - Disease: ${disease}, Score: ${Math.round(severityScore * 10) / 10}/10, Level: ${severityLevel}`);
+        }
+        break;
+      }
+    }
+
     let lastError: unknown;
     for (const modelId of candidateModels) {
       try {
         const model = genAI.getGenerativeModel({ model: modelId });
         const result = await model.generateContent(chatPrompt);
-        return res.status(200).json({ 
+        const response: any = {
           reply: result.response.text(),
           source: 'gemini_ai'
-        });
+        };
+        
+        // Add severity if detected
+        if (detectedDisease) {
+          response.severity = {
+            score: Math.round(severityScore * 10) / 10,
+            level: severityLevel,
+            isEmergency: isEmergencySituation,
+            disease: detectedDisease
+          };
+        }
+        
+        return res.status(200).json(response);
       } catch (err) {
         lastError = err;
         if (isNotFound(err)) {
