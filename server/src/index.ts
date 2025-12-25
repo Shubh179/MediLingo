@@ -14,9 +14,6 @@ import { SESSION_SECRET, NODE_ENV, FRONTEND_URL, PORT } from './config/env';
 // Initialize configuration
 dotenv.config();
 
-// Connect to MongoDB
-connectDB();
-
 const app: Application = express();
 
 // Middleware - Cookie Parser
@@ -57,7 +54,42 @@ app.use('/api/chat', chatRoutes);
 app.get('/', (req: Request, res: Response) => {
   res.send('MediLingo API is running...');
 });
-
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running in ${NODE_ENV} mode on port ${PORT}`);
+// Global error handlers
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
 });
+
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error);
+  process.exit(1);
+});
+
+// Start server function
+async function startServer() {
+  try {
+    // Connect to MongoDB first
+    await connectDB();
+
+    // Start server
+    const server = app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 Server running in ${NODE_ENV} mode on port ${PORT}`);
+      console.log(`📡 API available at http://0.0.0.0:${PORT}`);
+    });
+
+    server.on('error', (error: NodeJS.ErrnoException) => {
+      if (error.code === 'EADDRINUSE') {
+        console.error(`❌ Port ${PORT} is already in use`);
+        process.exit(1);
+      } else {
+        console.error('❌ Server error:', error);
+        process.exit(1);
+      }
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+// Start the server
+startServer();

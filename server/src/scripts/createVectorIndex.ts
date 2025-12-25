@@ -24,7 +24,7 @@ async function createVectorIndex() {
             type: 'vector',
             path: 'healthSummaryVector',
             similarity: 'cosine',
-            dimensions: 384
+            numDimensions: 384
           },
           {
             type: 'filter',

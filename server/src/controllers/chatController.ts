@@ -132,8 +132,13 @@ export const handleChat = async (req: Request, res: Response) => {
   try {
     const { userId, userMessage } = req.body;
 
+    // Validate userMessage
+    if (!userMessage || typeof userMessage !== 'string') {
+      return res.status(400).json({ error: 'userMessage is required and must be a string' });
+    }
+
     // 1. Fetch the Patient's History to give Gemini context
-    const history = await MedicalHistory.findOne({ userId });
+    const history = userId ? await MedicalHistory.findOne({ userId }) : null;
     const context = history 
       ? `Patient History: ${history.chronicConditions.join(", ")}. Current Meds: ${history.activeMedications.map(m => m.name).join(", ")}.`
       : "No previous history found.";
