@@ -25,8 +25,25 @@ const ChatInput = ({ onSendMessage, onSendVoiceBlob, isLoading, autoStartVoice }
   const analyserRef = useRef<AnalyserNode | null>(null);
   const rafRef = useRef<number | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const autoSendAfterStop = useRef<boolean>(false);
 
   const handleSend = () => {
+    // If recording, stop and auto-send the voice
+    if (isRecording) {
+      autoSendAfterStop.current = true;
+      stopRecording();
+      return;
+    }
+    
+    // If we have a recorded blob, send it
+    if (recordedBlob) {
+      onSendVoiceBlob?.(recordedBlob);
+      setRecordedBlob(null);
+      setElapsedMs(0);
+      return;
+    }
+    
+    // Otherwise send text
     if (!input.trim() || isLoading) return;
     onSendMessage(input.trim());
     setInput('');
@@ -55,6 +72,16 @@ const ChatInput = ({ onSendMessage, onSendVoiceBlob, isLoading, autoStartVoice }
         const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
         chunksRef.current = [];
         setRecordedBlob(blob);
+        
+        // Auto-send if send button was clicked during recording
+        if (autoSendAfterStop.current) {
+          autoSendAfterStop.current = false;
+          setTimeout(() => {
+            onSendVoiceBlob?.(blob);
+            setRecordedBlob(null);
+            setElapsedMs(0);
+          }, 0);
+        }
       };
       recorder.start();
       setIsRecording(true);
@@ -200,7 +227,7 @@ const ChatInput = ({ onSendMessage, onSendVoiceBlob, isLoading, autoStartVoice }
         />
         <Button
           onClick={handleSend}
-          disabled={!input.trim() || isLoading}
+          disabled={(!input.trim() && !isRecording && !recordedBlob) || isLoading}
           size="icon"
           className="bg-primary hover:bg-primary/90 text-white flex-shrink-0"
         >
@@ -216,15 +243,6 @@ const ChatInput = ({ onSendMessage, onSendVoiceBlob, isLoading, autoStartVoice }
           {/* Mic emoji per request */}
           <span className="text-lg">🎤</span>
         </Button>
-        {recordedBlob && (
-          <Button
-            onClick={sendRecordedBlob}
-            disabled={isLoading}
-            className="bg-primary hover:bg-primary/90 text-white"
-          >
-            Send Voice
-          </Button>
-        )}
       </div>
       {isRecording && (
         <div className="max-w-4xl mx-auto mt-2 text-sm flex items-center gap-3 bg-gray-100 border border-gray-200 rounded-md px-3 py-2">
@@ -256,28 +274,12 @@ const ChatInput = ({ onSendMessage, onSendVoiceBlob, isLoading, autoStartVoice }
               <Pause className="w-4 h-4" />
             </button>
           )}
-          <button
-            onClick={stopRecording}
-            title="Stop"
-            className="text-gray-700 hover:text-gray-900"
-          >
-            {/* Stop by tapping mic; also expose stop here */}
-            <span className="font-medium">Stop</span>
-          </button>
-          <button
-            onClick={sendRecordedBlob}
-            disabled={!recordedBlob}
-            className="bg-green-600 hover:bg-green-700 text-white rounded-full w-10 h-10 flex items-center justify-center"
-            title="Send Voice"
-          >
-            <SendIcon className="w-5 h-5" />
-          </button>
         </div>
       )}
       {!isRecording && recordedBlob && (
         <div className="max-w-4xl mx-auto mt-2 text-sm flex items-center gap-3 bg-gray-100 border border-gray-200 rounded-md px-3 py-2">
           <Trash2 className="w-4 h-4 text-gray-600" />
-          <span className="text-gray-700">Voice ready</span>
+          <span className="text-gray-700">Voice ready - Click send to submit</span>
           <span className="text-gray-600">{formatElapsed(elapsedMs)}</span>
           <canvas ref={canvasRef} width={180} height={24} className="flex-1 h-6" />
           <button
@@ -286,13 +288,6 @@ const ChatInput = ({ onSendMessage, onSendVoiceBlob, isLoading, autoStartVoice }
             title="Discard"
           >
             Discard
-          </button>
-          <button
-            onClick={sendRecordedBlob}
-            className="bg-green-600 hover:bg-green-700 text-white rounded-full w-10 h-10 flex items-center justify-center"
-            title="Send Voice"
-          >
-            <SendIcon className="w-5 h-5" />
           </button>
         </div>
       )}

@@ -1,4 +1,4 @@
-import { Camera, Sparkles, MessageCircle, Upload, Video, MapPin, Building2 } from "lucide-react";
+import { Camera, Sparkles, MessageCircle, Upload, Video, MapPin, Building2, Ambulance, Droplets, Pill, CalendarCheck, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useState } from "react";
@@ -17,6 +17,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/components/ui/use-toast";
 import PharmacyFinder from "@/components/PharmacyFinder";
 import { HospitalFinder } from "@/components/HospitalFinder";
+import AmbulanceFinder from "@/components/AmbulanceFinder";
+import BloodBankFinder from "@/components/BloodBankFinder";
+import JanAushadhiFinder from "@/components/JanAushadhiFinder";
+import BookAppointment from "@/components/BookAppointment";
+import MedicineDelivery from "@/components/MedicineDelivery";
 
 interface HeroSectionProps {
   onScanClick: () => void;
@@ -31,6 +36,11 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
   const [chatInitialMessage, setChatInitialMessage] = useState<string | null>(null);
   const [showHospitalDialog, setShowHospitalDialog] = useState(false);
   const [showPharmacyDialog, setShowPharmacyDialog] = useState(false);
+  const [showAmbulanceDialog, setShowAmbulanceDialog] = useState(false);
+  const [showBloodBankDialog, setShowBloodBankDialog] = useState(false);
+  const [showJanDialog, setShowJanDialog] = useState(false);
+  const [showAppointmentDialog, setShowAppointmentDialog] = useState(false);
+  const [showDeliveryDialog, setShowDeliveryDialog] = useState(false);
   const [autoStartVoice, setAutoStartVoice] = useState(false);
   const { isAuthenticated } = useAuth();
 
@@ -88,6 +98,28 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
     setShowPharmacyDialog(true);
   };
 
+  const openAmbulanceFinder = () => {
+    setShowAmbulanceDialog(true);
+  };
+
+  const openBloodBankFinder = () => {
+    setShowBloodBankDialog(true);
+  };
+
+  const openJanAushadhiFinder = () => {
+    setShowJanDialog(true);
+  };
+
+  const openAppointmentDialog = () => {
+    if (!ensureLoggedIn()) return;
+    setShowAppointmentDialog(true);
+  };
+
+  const openDeliveryDialog = () => {
+    if (!ensureLoggedIn()) return;
+    setShowDeliveryDialog(true);
+  };
+
   return (
     <section className="min-h-[calc(100svh-4rem)] md:min-h-[calc(100vh-4rem)] bg-gradient-to-br from-background via-background to-primary/5 px-5 pb-[env(safe-area-inset-bottom)] flex flex-col relative overflow-hidden">
       {/* Grid background - entire page */}
@@ -102,17 +134,48 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
         <div className="absolute bottom-32 right-10 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl animate-pulse delay-700"></div>
       </div>
 
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-start pt-4 md:pt-6 pb-4">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-start pt-4 md:pt-6 pb-4 max-w-4xl mx-auto w-full">
         {/* Prescription Upload Component */}
-        <div className="w-full mb-6 fade-up" style={{ animationDelay: "0.1s" }}>
+        <div className="w-full mb-4 fade-up" style={{ animationDelay: "0.1s" }}>
           <PrescriptionUpload 
             onCameraClick={handleCameraClick}
             onUploadClick={handleGalleryClick}
           />
         </div>
 
+        {/* Emergency Quick Access */}
+        <div className="w-full max-w-2xl mx-auto flex flex-wrap justify-center gap-2 fade-up mb-3" style={{ animationDelay: "0.12s" }}>
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-2 px-4 py-2.5 text-sm rounded-full border-2 border-red-500/70 text-red-600 bg-white shadow-md hover:bg-red-50 hover:scale-105 transition-all font-medium"
+            onClick={openAmbulanceFinder}
+          >
+            <Ambulance className="w-4 h-4" />
+            Ambulance
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-2 px-4 py-2.5 text-sm rounded-full border-2 border-rose-500/70 text-rose-600 bg-white shadow-md hover:bg-rose-50 hover:scale-105 transition-all font-medium"
+            onClick={openBloodBankFinder}
+          >
+            <Droplets className="w-4 h-4" />
+            Blood Bank
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-2 px-4 py-2.5 text-sm rounded-full border-2 border-emerald-600/70 text-emerald-700 bg-white shadow-md hover:bg-emerald-50 hover:scale-105 transition-all font-medium"
+            onClick={openJanAushadhiFinder}
+          >
+            <Pill className="w-4 h-4" />
+            Jan Aushadhi
+          </Button>
+        </div>
+
         {/* Chat Input Box */}
-        <div className="w-full max-w-2xl mx-auto mb-4 fade-up" style={{ animationDelay: "0.15s" }}>
+        <div className="w-full max-w-2xl mx-auto mb-3 fade-up" style={{ animationDelay: "0.18s" }}>
           <div 
             onClick={() => {
               if (!ensureLoggedIn()) return;
@@ -141,11 +204,11 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
         </div>
 
         {/* Quick Action Buttons */}
-        <div className="flex flex-wrap justify-center gap-2 fade-up mt-2 md:mt-3" style={{ animationDelay: "0.2s" }}>
+        <div className="w-full max-w-2xl mx-auto flex flex-wrap justify-center gap-2 fade-up mt-1 mb-4" style={{ animationDelay: "0.24s" }}>
           <Button
             size="sm"
             variant="outline"
-            className="gap-2 px-3 py-2 text-sm rounded-full border border-primary/70 text-primary bg-white shadow-sm hover:bg-primary/10"
+            className="gap-2 px-4 py-2.5 text-sm rounded-full border-2 border-primary/70 text-primary bg-white shadow-md hover:bg-primary/10 hover:scale-105 transition-all font-medium"
             onClick={handleScanClick}
           >
             <Camera className="w-4 h-4" />
@@ -154,7 +217,7 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
           <Button
             size="sm"
             variant="outline"
-            className="gap-2 px-3 py-2 text-sm rounded-full border border-primary/70 text-primary bg-white shadow-sm hover:bg-primary/10"
+            className="gap-2 px-4 py-2.5 text-sm rounded-full border-2 border-primary/70 text-primary bg-white shadow-md hover:bg-primary/10 hover:scale-105 transition-all font-medium"
             onClick={openHospitalFinder}
           >
             <Building2 className="w-4 h-4" />
@@ -163,11 +226,29 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
           <Button
             size="sm"
             variant="outline"
-            className="gap-2 px-3 py-2 text-sm rounded-full border border-primary/70 text-primary bg-white shadow-sm hover:bg-primary/10"
+            className="gap-2 px-4 py-2.5 text-sm rounded-full border-2 border-primary/70 text-primary bg-white shadow-md hover:bg-primary/10 hover:scale-105 transition-all font-medium"
             onClick={openPharmacyFinder}
           >
             <MapPin className="w-4 h-4" />
             {t.nav.nearbyPharmacies}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-2 px-4 py-2.5 text-sm rounded-full border-2 border-blue-500/70 text-blue-600 bg-white shadow-md hover:bg-blue-50 hover:scale-105 transition-all font-medium"
+            onClick={openAppointmentDialog}
+          >
+            <CalendarCheck className="w-4 h-4" />
+            Book Appointment
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-2 px-4 py-2.5 text-sm rounded-full border-2 border-emerald-600/70 text-emerald-700 bg-white shadow-md hover:bg-emerald-50 hover:scale-105 transition-all font-medium"
+            onClick={openDeliveryDialog}
+          >
+            <Truck className="w-4 h-4" />
+            Medicine Delivery
           </Button>
         </div>
       </div>
@@ -230,6 +311,71 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
             </DialogDescription>
           </DialogHeader>
           <PharmacyFinder />
+        </DialogContent>
+      </Dialog>
+
+      {/* Emergency Ambulance Dialog */}
+      <Dialog open={showAmbulanceDialog} onOpenChange={setShowAmbulanceDialog}>
+        <DialogContent className="sm:max-w-[480px]">
+          <DialogHeader>
+            <DialogTitle className="text-red-600">🚑 Emergency Ambulance</DialogTitle>
+            <DialogDescription>
+              Call these numbers for immediate medical emergency
+            </DialogDescription>
+          </DialogHeader>
+          <AmbulanceFinder />
+        </DialogContent>
+      </Dialog>
+
+      {/* Blood Bank Dialog */}
+      <Dialog open={showBloodBankDialog} onOpenChange={setShowBloodBankDialog}>
+        <DialogContent className="sm:max-w-[520px]">
+          <DialogHeader>
+            <DialogTitle className="text-rose-600">🩸 Find Blood Bank</DialogTitle>
+            <DialogDescription>
+              Call a nearby blood bank or use your location to find the closest option.
+            </DialogDescription>
+          </DialogHeader>
+          <BloodBankFinder />
+        </DialogContent>
+      </Dialog>
+
+      {/* Jan Aushadhi Dialog */}
+      <Dialog open={showJanDialog} onOpenChange={setShowJanDialog}>
+        <DialogContent className="sm:max-w-[520px]">
+          <DialogHeader>
+            <DialogTitle className="text-emerald-700">💊 Jan Aushadhi Finder</DialogTitle>
+            <DialogDescription>
+              Find low-cost generic alternatives and nearby Jan Aushadhi stores.
+            </DialogDescription>
+          </DialogHeader>
+          <JanAushadhiFinder />
+        </DialogContent>
+      </Dialog>
+
+      {/* Book Appointment Dialog */}
+      <Dialog open={showAppointmentDialog} onOpenChange={setShowAppointmentDialog}>
+        <DialogContent className="sm:max-w-[520px]">
+          <DialogHeader>
+            <DialogTitle className="text-blue-700">📅 Book Doctor Appointment</DialogTitle>
+            <DialogDescription>
+              Schedule an appointment with a specialist at your preferred time.
+            </DialogDescription>
+          </DialogHeader>
+          <BookAppointment />
+        </DialogContent>
+      </Dialog>
+
+      {/* Medicine Delivery Dialog */}
+      <Dialog open={showDeliveryDialog} onOpenChange={setShowDeliveryDialog}>
+        <DialogContent className="sm:max-w-[520px]">
+          <DialogHeader>
+            <DialogTitle className="text-emerald-700">🚚 Order Medicine Delivery</DialogTitle>
+            <DialogDescription>
+              Get medicines delivered to your doorstep in 1-2 hours.
+            </DialogDescription>
+          </DialogHeader>
+          <MedicineDelivery />
         </DialogContent>
       </Dialog>
 
