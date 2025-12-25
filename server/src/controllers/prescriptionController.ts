@@ -5,7 +5,7 @@ import { Prescription } from '../models/Prescription';
 import { MedicalHistory } from '../models/MedicalHistory';
 
 // Use the stable model identifier
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY!);
 
 const candidateModels = [
   GEMINI_MODEL,

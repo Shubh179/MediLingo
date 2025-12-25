@@ -7,8 +7,21 @@ interface ChatMessageProps {
   isLoading?: boolean;
 }
 
+const parseMarkdown = (text: string) => {
+  // Replace **text** with <strong>text</strong>
+  text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  // Replace *text* with <em>text</em>
+  text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+  // Replace __text__ with <strong>text</strong>
+  text = text.replace(/__(.*?)__/g, '<strong>$1</strong>');
+  // Replace _text_ with <em>text</em>
+  text = text.replace(/_(.*?)_/g, '<em>$1</em>');
+  return text;
+};
+
 const ChatMessage = ({ role, content, isLoading }: ChatMessageProps) => {
   const isUser = role === 'user';
+  const parsedContent = parseMarkdown(content);
 
   return (
     <div className={cn(
@@ -40,7 +53,10 @@ const ChatMessage = ({ role, content, isLoading }: ChatMessageProps) => {
               <div className="w-2 h-2 bg-current rounded-full animate-bounce delay-200" />
             </div>
           ) : (
-            <p className="text-sm leading-relaxed whitespace-pre-wrap">{content}</p>
+            <p 
+              className="text-sm leading-relaxed whitespace-pre-wrap"
+              dangerouslySetInnerHTML={{ __html: parsedContent }}
+            />
           )}
         </div>
       </div>

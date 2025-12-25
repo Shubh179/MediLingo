@@ -25,6 +25,9 @@ if (envPath) {
 // Accept either GEMINI_API_KEY or GOOGLE_API_KEY to avoid naming drift
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 
+// Optional OpenAI key for TTS
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
 // Allow overriding Gemini model; default to gemini-2.5-flash since you have access
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 
@@ -75,6 +78,7 @@ if (!MONGODB_URI) {
 export { 
   GEMINI_API_KEY, 
   GEMINI_MODEL,
+  OPENAI_API_KEY,
   SESSION_SECRET,
   NODE_ENV,
   EMAIL_USER,
