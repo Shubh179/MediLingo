@@ -1,4 +1,54 @@
 /**
+ * Send appointment confirmation email
+ * @param details Appointment details: { name, email, phone, date, time, specialty, notes }
+ * @returns Promise<boolean> - true if sent successfully
+ */
+export const sendAppointmentConfirmation = async (details: {
+  name: string;
+  email: string;
+  phone: string;
+  date: string;
+  time: string;
+  specialty: string;
+  notes?: string;
+}): Promise<boolean> => {
+  try {
+    const { name, email, phone, date, time, specialty, notes } = details;
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'MediLingo - Appointment Confirmation',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px;">
+            <h2 style="color: #2563eb; margin-bottom: 20px;">Appointment Confirmed</h2>
+            <p style="color: #333;">Dear <b>${name}</b>,</p>
+            <p style="color: #666; margin-bottom: 20px;">
+              Your appointment has been successfully booked. Here are your details:
+            </p>
+            <ul style="color: #444; font-size: 15px; line-height: 1.7;">
+              <li><b>Date:</b> ${date}</li>
+              <li><b>Time:</b> ${time}</li>
+              <li><b>Specialty:</b> ${specialty}</li>
+              <li><b>Phone:</b> ${phone}</li>
+              ${notes ? `<li><b>Notes:</b> ${notes}</li>` : ''}
+            </ul>
+            <p style="color: #2563eb; font-weight: bold; margin-top: 24px;">Please be available at the scheduled time. Our team will contact you if any further information is needed.</p>
+            <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+            <p style="color: #999; font-size: 12px;">© 2025 MediLingo. All rights reserved.</p>
+          </div>
+        </div>
+      `,
+    };
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`✅ Appointment confirmation sent to ${email}. Message ID: ${info.messageId}`);
+    return true;
+  } catch (error: any) {
+    console.error(`❌ Failed to send appointment confirmation to ${details.email}:`, error.message);
+    return false;
+  }
+};
+/**
  * Email Service - Handles sending OTP and welcome emails using Nodemailer
  * Configured with Gmail SMTP
  */

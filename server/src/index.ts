@@ -9,6 +9,8 @@ import voiceRoutes from './routes/voiceRoutes';
 import authRoutes from './routes/authRoutes';
 import paymentRoutes from './routes/paymentRoutes';
 import chatRoutes from './routes/chatRoutes';
+import appointmentRoutes from './routes/appointmentRoutes';
+import doctorRoutes from './routes/doctorRoutes';
 import { SESSION_SECRET, NODE_ENV, FRONTEND_URL, PORT } from './config/env';
 
 // Initialize configuration
@@ -49,6 +51,8 @@ app.use('/api/prescriptions', prescriptionRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/voice', voiceRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/appointment', appointmentRoutes);
+app.use('/api/doctor', doctorRoutes);
 
 // Basic Health Check Route
 app.get('/', (req: Request, res: Response) => {
