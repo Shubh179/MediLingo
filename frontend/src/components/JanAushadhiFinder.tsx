@@ -154,8 +154,9 @@ const JanAushadhiFinder = () => {
     mapPoint.lng + bboxSize,
     mapPoint.lat + bboxSize,
   ].join("%2C");
-  const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${mapPoint.lat}%2C${mapPoint.lng}`;
-  const mapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=Jan+Aushadhi+nearby`;
+  // Use Google Maps embed centered near user's location for Jan Aushadhi search
+  const mapUrl = `https://www.google.com/maps?q=${encodeURIComponent(`Jan Aushadhi near ${mapPoint.lat},${mapPoint.lng}`)}&z=14&output=embed`;
+  const mapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`Jan Aushadhi near ${mapPoint.lat},${mapPoint.lng}`)}`;
 
   return (
     <div className="space-y-4">
