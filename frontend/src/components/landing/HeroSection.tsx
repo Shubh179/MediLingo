@@ -290,7 +290,7 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
         <div className="w-full max-w-2xl mx-auto mb-3 fade-up" style={{ animationDelay: "0.19s" }}>
           <Button
             onClick={() => setShowDoctorChat(true)}
-            className="w-full flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full py-3 px-6 text-lg font-semibold shadow-md"
+            className="w-full flex items-center gap-3 bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-full py-3 px-6 text-lg font-semibold shadow-md"
           >
             <img src="https://cdn-icons-png.flaticon.com/512/387/387561.png" alt="Doctor" className="w-7 h-7 rounded-full border-2 border-white bg-white mr-2" />
             Consult a Doctor
