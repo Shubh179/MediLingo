@@ -6,13 +6,14 @@ interface User {
   name: string;
   email: string;
   age?: number;
+  gender?: 'Male' | 'Female';
 }
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string, age: number, name: string) => Promise<void>;
+  signup: (email: string, password: string, age: number, name: string, gender?: 'Male' | 'Female') => Promise<void>;
   logout: () => void;
   forgotPassword: (email: string) => Promise<void>;
   resetPassword: (email: string, otp: string, newPassword: string) => Promise<void>;
@@ -62,6 +63,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         name: data.user.name,
         email: data.user.email,
         age: data.user.age,
+        gender: data.user.gender,
       };
       
       setUser(userData);
@@ -80,7 +82,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const signup = async (email: string, password: string, age: number, name: string) => {
+  const signup = async (email: string, password: string, age: number, name: string, gender?: 'Male' | 'Female') => {
     try {
       console.log('📝 Attempting signup for:', email);
       const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
@@ -89,7 +91,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           'Content-Type': 'application/json',
         },
         credentials: 'include', // Important for session cookies
-        body: JSON.stringify({ email, password, age, name }),
+        body: JSON.stringify({ email, password, age, name, gender }),
       });
 
       if (!response.ok) {
@@ -105,6 +107,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         name: data.user.name,
         email: data.user.email,
         age: data.user.age,
+        gender: data.user.gender,
       };
       
       setUser(userData);

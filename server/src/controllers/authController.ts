@@ -17,7 +17,7 @@ declare global {
  */
 export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, password, age, name } = req.body;
+    const { email, password, age, name, gender } = req.body;
 
     // Validation
     if (!email || !password || !age) {
@@ -73,6 +73,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       email: email.toLowerCase(),
       password,
       age: ageNum,
+      gender, // Add gender
       languagePreference: 'English',
       tier: 'Free',
     });
@@ -95,6 +96,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
         email: newUser.email,
         name: newUser.name,
         age: newUser.age,
+        gender: newUser.gender,
       },
     });
   } catch (error: any) {
@@ -156,6 +158,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         email: user.email,
         name: user.name,
         age: user.age,
+        gender: user.gender,
       },
     });
   } catch (error: any) {
@@ -364,7 +367,7 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
       return;
     }
 
-    const user = await User.findById(userId).select('-password -otpCode -otpExpires');
+    const user = await User.findById(userId).select('-password -otpCode -otpExpires -sharingCode');
 
     if (!user) {
       res.status(404).json({
@@ -400,7 +403,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
-    const { name, age } = req.body as { name?: string; age?: number };
+    const { name, age, gender } = req.body as { name?: string; age?: number; gender?: 'Male' | 'Female' };
 
     if (!name || typeof name !== 'string' || !name.trim()) {
       res.status(400).json({ success: false, message: 'Valid name is required' });
@@ -421,9 +424,12 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
 
     user.name = name.trim();
     user.age = ageNum;
+    if (gender) {
+      user.gender = gender;
+    }
     await user.save();
 
-    const safeUser = await User.findById(userId).select('-password -otpCode -otpExpires');
+    const safeUser = await User.findById(userId).select('-password -otpCode -otpExpires -sharingCode');
 
     res.status(200).json({ success: true, message: 'Profile updated successfully', user: safeUser });
   } catch (error: any) {
