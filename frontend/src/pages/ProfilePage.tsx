@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
-import { Mail, User, Cake, Edit2, Save, X, Eye, EyeOff } from "lucide-react";
+import { Mail, User, Cake, Edit2, Save, X, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface UserProfile {
@@ -94,12 +94,13 @@ const ProfilePage = () => {
 
     setIsSaving(true);
     try {
-      const response = await fetch("/api/auth/profile", {
+      const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || "";
+      const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
+        credentials: "include",
         body: JSON.stringify({
           name: editedProfile.name,
           age: parseInt(editedProfile.age),
@@ -158,12 +159,13 @@ const ProfilePage = () => {
 
     setIsSaving(true);
     try {
-      const response = await fetch("/api/auth/change-password", {
+      const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || "";
+      const response = await fetch(`${API_BASE_URL}/api/auth/change-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
+        credentials: "include",
         body: JSON.stringify({
           currentPassword: passwordData.currentPassword,
           newPassword: passwordData.newPassword,
@@ -221,26 +223,25 @@ const ProfilePage = () => {
         <meta name="description" content="Manage your MediLingo profile" />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex flex-col">
         <GlassNav />
 
-        <div className="flex items-center justify-center min-h-[calc(100vh-80px)] px-4 py-8">
+        <div className="flex-1 flex items-center justify-center px-4 py-6">
           <div className="w-full max-w-md">
-            {/* Back Button */}
-            <div className="mb-4 flex">
-              <button
-                onClick={() => navigate("/")}
-                className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 transition-colors text-sm font-medium"
-                title="Go back"
-              >
-                <span>⬅️</span>
-                Back
-              </button>
-            </div>
             
             <div className="space-y-3">
             {/* Profile Header Card */}
             <div className="bg-gradient-to-r from-teal-500 to-teal-600 rounded-xl shadow-lg p-4 text-white relative overflow-hidden">
+              {/* Back Button - Top Left */}
+              <button
+                onClick={() => navigate("/")}
+                className="absolute top-3 left-3 z-20 flex items-center gap-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm px-3 py-1.5 rounded-lg transition-all duration-200 text-white text-sm font-medium"
+                title="Go back"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back
+              </button>
+
               {/* Decorative elements */}
               <div className="absolute top-0 right-0 w-24 h-24 bg-teal-400 rounded-full opacity-20 -mr-12 -mt-12"></div>
               <div className="absolute bottom-0 left-0 w-20 h-20 bg-teal-400 rounded-full opacity-20 -ml-10 -mb-10"></div>

@@ -6,6 +6,8 @@ import {
   resetPassword,
   logout,
   getProfile,
+  updateProfile,
+  changePassword,
 } from '../controllers/authController';
 import { isAuthenticated } from '../middleware/auth';
 
@@ -60,5 +62,19 @@ router.post('/logout', isAuthenticated, logout);
  * Headers: Requires valid session cookie
  */
 router.get('/profile', isAuthenticated, getProfile);
+
+/**
+ * PUT /api/auth/profile
+ * Update current user's profile
+ * Body: { name, age }
+ */
+router.put('/profile', isAuthenticated, updateProfile);
+
+/**
+ * POST /api/auth/change-password
+ * Change password for current user
+ * Body: { currentPassword, newPassword }
+ */
+router.post('/change-password', isAuthenticated, changePassword);
 
 export default router;

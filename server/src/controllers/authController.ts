@@ -387,3 +387,93 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
     });
   }
 };
+
+/**
+ * UPDATE PROFILE - Update current user's name and age (protected route)
+ */
+export const updateProfile = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = (req.session as any).userId;
+
+    if (!userId) {
+      res.status(401).json({ success: false, message: 'Not authenticated. Please login first.' });
+      return;
+    }
+
+    const { name, age } = req.body as { name?: string; age?: number };
+
+    if (!name || typeof name !== 'string' || !name.trim()) {
+      res.status(400).json({ success: false, message: 'Valid name is required' });
+      return;
+    }
+
+    const ageNum = Number(age);
+    if (!ageNum || isNaN(ageNum) || ageNum < 1 || ageNum > 150) {
+      res.status(400).json({ success: false, message: 'Age must be between 1 and 150' });
+      return;
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({ success: false, message: 'User not found' });
+      return;
+    }
+
+    user.name = name.trim();
+    user.age = ageNum;
+    await user.save();
+
+    const safeUser = await User.findById(userId).select('-password -otpCode -otpExpires');
+
+    res.status(200).json({ success: true, message: 'Profile updated successfully', user: safeUser });
+  } catch (error: any) {
+    console.error('Update profile error:', error);
+    res.status(500).json({ success: false, message: 'Error updating profile', error: error.message });
+  }
+};
+
+/**
+ * CHANGE PASSWORD - Update password after verifying current password (protected route)
+ */
+export const changePassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = (req.session as any).userId;
+
+    if (!userId) {
+      res.status(401).json({ success: false, message: 'Not authenticated. Please login first.' });
+      return;
+    }
+
+    const { currentPassword, newPassword } = req.body as { currentPassword?: string; newPassword?: string };
+
+    if (!currentPassword || !newPassword) {
+      res.status(400).json({ success: false, message: 'Current password and new password are required' });
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      res.status(400).json({ success: false, message: 'New password must be at least 6 characters long' });
+      return;
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({ success: false, message: 'User not found' });
+      return;
+    }
+
+    const isValid = await user.comparePassword(currentPassword);
+    if (!isValid) {
+      res.status(401).json({ success: false, message: 'Current password is incorrect' });
+      return;
+    }
+
+    user.password = newPassword; // hashed by pre-save hook
+    await user.save();
+
+    res.status(200).json({ success: true, message: 'Password changed successfully' });
+  } catch (error: any) {
+    console.error('Change password error:', error);
+    res.status(500).json({ success: false, message: 'Error changing password', error: error.message });
+  }
+};
