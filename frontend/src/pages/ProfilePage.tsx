@@ -47,21 +47,39 @@ const ProfilePage = () => {
     confirmPassword: "",
   });
 
-  // Fetch user profile
+  // Fetch latest profile from backend (MongoDB) and sync UI
   useEffect(() => {
-    if (isAuthenticated && user) {
-      setProfile({
-        name: user.name || "",
-        email: user.email || "",
-        age: user.age ? String(user.age) : "",
-      });
-      setEditedProfile({
-        name: user.name || "",
-        email: user.email || "",
-        age: user.age ? String(user.age) : "",
-      });
-    }
-  }, [isAuthenticated, user]);
+    const refreshProfile = async () => {
+      if (!isAuthenticated) return;
+      try {
+        setIsLoadingProfile(true);
+        const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || "http://localhost:5001";
+        const resp = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!resp.ok) throw new Error("Failed to fetch profile");
+        const data = await resp.json();
+        const u = data?.user || user;
+        setProfile({
+          name: u?.name || "",
+          email: u?.email || "",
+          age: u?.age ? String(u.age) : "",
+        });
+        setEditedProfile({
+          name: u?.name || "",
+          email: u?.email || "",
+          age: u?.age ? String(u.age) : "",
+        });
+      } catch (err) {
+        console.error("Profile fetch error:", err);
+      } finally {
+        setIsLoadingProfile(false);
+      }
+    };
+
+    refreshProfile();
+  }, [isAuthenticated]);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -94,7 +112,7 @@ const ProfilePage = () => {
 
     setIsSaving(true);
     try {
-      const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || "";
+      const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || "http://localhost:5001";
       const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
         method: "PUT",
         headers: {
@@ -111,7 +129,13 @@ const ProfilePage = () => {
         throw new Error("Failed to update profile");
       }
 
-      setProfile(editedProfile);
+      const data = await response.json();
+      const u = data?.user || editedProfile;
+      setProfile({
+        name: u?.name || editedProfile.name,
+        email: u?.email || profile.email,
+        age: u?.age ? String(u.age) : editedProfile.age,
+      });
       setIsEditing(false);
       toast({
         title: "Success",
@@ -159,7 +183,7 @@ const ProfilePage = () => {
 
     setIsSaving(true);
     try {
-      const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || "";
+      const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || "http://localhost:5001";
       const response = await fetch(`${API_BASE_URL}/api/auth/change-password`, {
         method: "POST",
         headers: {
