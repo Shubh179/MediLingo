@@ -293,7 +293,7 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
 
       {/* Jan Aushadhi Dialog */}
       <Dialog open={showJanDialog} onOpenChange={setShowJanDialog}>
-        <DialogContent className="sm:max-w-[520px]">
+        <DialogContent className="sm:max-w-[520px] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-emerald-700">💊 Jan Aushadhi Finder</DialogTitle>
             <DialogDescription>

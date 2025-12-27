@@ -66,7 +66,13 @@ const SYMPTOM_TO_DISEASE_MAP: { [key: string]: string } = {
   'sleep': 'Insomnia',
   'itching': 'Eczema',
   'stroke': 'Stroke',
-  'heart attack': 'Heart Disease'
+  'heart attack': 'Heart Disease',
+  'cold hands': "Raynaud's Disease",
+  'cold feet': "Raynaud's Disease",
+  'raynaud': "Raynaud's Disease",
+  'raynauds': "Raynaud's Disease",
+  'freezing hands': "Raynaud's Disease",
+  'freezing feet': "Raynaud's Disease"
 };
 
 // Extract disease name from message and try to find direct match
@@ -94,38 +100,53 @@ const findDiseaseFromQuery = async (userMessage: string) => {
 };
 
 const performSemanticSearch = async (userMessage: string) => {
-  // Generate embedding for user query (384-D)
-  const embeddingModel = genAI.getGenerativeModel({ model: 'text-embedding-004' });
-  const embeddingResult = await embeddingModel.embedContent({
-    content: { role: 'user', parts: [{ text: userMessage }] },
-    taskType: TaskType.RETRIEVAL_QUERY,
-    outputDimensionality: 384,
-  });
-  const queryVector = embeddingResult.embedding.values;
+  try {
+    // Generate embedding for user query (384-D)
+    const embeddingModel = genAI.getGenerativeModel({ model: 'text-embedding-004' });
+    const embeddingResult = await embeddingModel.embedContent({
+      content: { role: 'user', parts: [{ text: userMessage }] },
+      taskType: TaskType.RETRIEVAL_QUERY,
+      outputDimensionality: 384,
+    });
+    const queryVector = embeddingResult.embedding.values;
 
-  // Perform vector search using MongoDB Atlas Vector Search
-  const results = await MedicalKnowledge.aggregate([
-    {
-      $vectorSearch: {
-        index: 'vector_index', // Atlas vector search index name
-        path: 'healthSummaryVector',
-        queryVector: queryVector,
-        numCandidates: 100,
-        limit: 3
+    // Perform vector search using MongoDB Atlas Vector Search
+    const results = await MedicalKnowledge.aggregate([
+      {
+        $vectorSearch: {
+          index: 'vector_index', // Atlas vector search index name
+          path: 'healthSummaryVector',
+          queryVector: queryVector,
+          numCandidates: 100,
+          limit: 3
+        }
+      },
+      {
+        $project: {
+          disease: 1,
+          remedy: 1,
+          precautions: 1,
+          symptoms: 1,
+          score: { $meta: 'vectorSearchScore' }
+        }
       }
-    },
-    {
-      $project: {
-        disease: 1,
-        remedy: 1,
-        precautions: 1,
-        symptoms: 1,
-        score: { $meta: 'vectorSearchScore' }
-      }
-    }
-  ]);
+    ]);
 
-  return results;
+    return results.length > 0 ? results : null;
+  } catch (vectorError) {
+    console.log('⚠️ Vector search failed:', (vectorError as any)?.message);
+    // Fallback: Use keyword matching on text_to_embed field
+    const keywordResults = await MedicalKnowledge.find({
+      $or: [
+        { text_to_embed: { $regex: userMessage, $options: 'i' } },
+        { disease: { $regex: userMessage, $options: 'i' } },
+        { remedy: { $regex: userMessage, $options: 'i' } },
+        { symptoms: { $elemMatch: { $regex: userMessage, $options: 'i' } } }
+      ]
+    }).limit(3).lean();
+    
+    return keywordResults.length > 0 ? keywordResults : null;
+  }
 };
 
 export const handleChat = async (req: Request, res: Response) => {
