@@ -1,7 +1,7 @@
 import { Camera, Sparkles, MessageCircle, Upload, Video, MapPin, Building2, Ambulance, Droplets, Pill, CalendarCheck, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PrescriptionCard from "./PrescriptionCard";
 import PrescriptionUpload from "./PrescriptionUpload";
 import CameraCapture from "@/components/CameraCapture";
@@ -24,6 +24,11 @@ import BookAppointment from "@/components/BookAppointment";
 import MedicineDelivery from "@/components/MedicineDelivery";
 import ActionSidebar from "./ActionSidebar";
 import DoctorChat from "@/components/DoctorChat";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useMenstrualCycle } from "@/contexts/MenstrualCycleContext";
 
 interface HeroSectionProps {
   onScanClick: () => void;
@@ -45,7 +50,54 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
   const [showDeliveryDialog, setShowDeliveryDialog] = useState(false);
   const [autoStartVoice, setAutoStartVoice] = useState(false);
   const [showDoctorChat, setShowDoctorChat] = useState(false);
+  const { settings, status, updateSettings, syncToGoogleCalendar } = useMenstrualCycle();
+  const [showCycleDialog, setShowCycleDialog] = useState(false);
+  const [cycleForm, setCycleForm] = useState({
+    periodDuration: settings.periodDuration,
+    cycleLength: settings.cycleLength,
+    lastPeriodStart: settings.lastPeriodStart ? new Date(settings.lastPeriodStart) : null,
+  });
   const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    setCycleForm({
+      periodDuration: settings.periodDuration,
+      cycleLength: settings.cycleLength,
+      lastPeriodStart: settings.lastPeriodStart ? new Date(settings.lastPeriodStart) : null,
+    });
+  }, [settings]);
+
+  const handleCycleSave = () => {
+    if (!cycleForm.lastPeriodStart) {
+      toast({
+        title: "Choose start date",
+        description: "Use the Google Calendar picker to anchor your cycle.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    updateSettings({
+      periodDuration: Number(cycleForm.periodDuration) || settings.periodDuration,
+      cycleLength: Number(cycleForm.cycleLength) || settings.cycleLength,
+      lastPeriodStart: cycleForm.lastPeriodStart.toISOString(),
+    });
+    setShowCycleDialog(false);
+    toast({ title: "Cycle saved", description: "Countdown refreshed and ready to sync." });
+  };
+
+  const handleGoogleSync = () => {
+    const url = syncToGoogleCalendar();
+    if (!url) {
+      toast({
+        title: "Add your cycle first",
+        description: "Save last period start to generate the calendar event.",
+        variant: "destructive",
+      });
+      return;
+    }
+    toast({ title: "Google Calendar", description: "Opening your recurring event in a new tab." });
+  };
 
   const ensureLoggedIn = () => {
     if (!isAuthenticated) {
@@ -148,6 +200,52 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
         <div className="absolute bottom-32 right-10 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl animate-pulse delay-700"></div>
       </div>
 
+      {/* Menstrual Cycle Tracker - Top Right (moved down 35%) */}
+      <div className="absolute top-16 right-5 z-20 fade-up max-w-sm" style={{ animationDelay: "0.1s" }}>
+        <div className="card-elevated border border-primary/30 bg-primary/5 p-4 md:p-5 rounded-3xl flex flex-col gap-3">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-primary">Menstrual Cycle Tracker</p>
+              <h3 className="text-lg font-bold text-foreground leading-tight">{status.countdownLabel}</h3>
+              <p className="text-xs text-muted-foreground mt-1">
+                {status.nextPeriodStart
+                  ? `Next window starts ${status.nextPeriodStart.toLocaleDateString()}${status.nextPeriodEnd ? ` • ends ${status.nextPeriodEnd.toLocaleDateString()}` : ""}`
+                  : "Save your cycle to start live countdowns."}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 text-xs text-foreground/80">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white border border-primary/20 shadow-sm">
+              <CalendarCheck className="w-3.5 h-3.5 text-primary" />
+              <span>{status.isDelayed ? "Delayed" : "On track"}</span>
+            </div>
+            {settings.lastPeriodStart && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white border border-border/80 text-muted-foreground">
+                <Droplets className="w-3.5 h-3.5 text-rose-500" />
+                {new Date(settings.lastPeriodStart).toLocaleDateString()}
+              </span>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Button
+              onClick={() => setShowCycleDialog(true)}
+              className="rounded-full bg-primary hover:bg-primary/90 text-white px-4 py-2 h-auto text-sm w-full"
+            >
+              Add Menstrual Cycle
+            </Button>
+            <Button
+              className="rounded-full bg-secondary hover:bg-secondary/90 text-white px-4 py-2 h-auto text-sm w-full"
+              onClick={handleGoogleSync}
+              disabled={!status.nextPeriodStart}
+            >
+              Sync with Google Calendar
+            </Button>
+          </div>
+        </div>
+      </div>
+
       <div className="relative z-10 flex-1 flex flex-col items-center justify-start pt-4 md:pt-6 pb-4 max-w-4xl mx-auto w-full">
         {/* Prescription Upload Component */}
         <div className="w-full mb-4 fade-up" style={{ animationDelay: "0.1s" }}>
@@ -203,6 +301,81 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
 
         {/* Removed quick action chips; available in sidebar */}
       </div>
+
+      {/* Menstrual Cycle Dialog */}
+      <Dialog open={showCycleDialog} onOpenChange={setShowCycleDialog}>
+        <DialogContent className="sm:max-w-[520px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Droplets className="w-5 h-5 text-rose-500" /> Add Menstrual Cycle
+            </DialogTitle>
+            <DialogDescription>
+              Save your cycle settings, pick the last period start with the Google Calendar date picker, and sync recurring reminders.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-4 pt-2">
+            <div className="grid gap-2">
+              <Label htmlFor="periodDuration">Period duration (days)</Label>
+              <Input
+                id="periodDuration"
+                type="number"
+                min={1}
+                max={14}
+                value={cycleForm.periodDuration}
+                onChange={(e) => setCycleForm((prev) => ({ ...prev, periodDuration: Number(e.target.value) }))}
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="cycleLength">Cycle length (days)</Label>
+              <Input
+                id="cycleLength"
+                type="number"
+                min={15}
+                max={60}
+                value={cycleForm.cycleLength}
+                onChange={(e) => setCycleForm((prev) => ({ ...prev, cycleLength: Number(e.target.value) }))}
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label>Last period start (Google Calendar)</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal"
+                  >
+                    <CalendarCheck className="w-4 h-4 mr-2" />
+                    {cycleForm.lastPeriodStart
+                      ? cycleForm.lastPeriodStart.toLocaleDateString()
+                      : "Choose date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={cycleForm.lastPeriodStart ?? undefined}
+                    onSelect={(value) => setCycleForm((prev) => ({ ...prev, lastPeriodStart: value ?? prev.lastPeriodStart }))}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              <p className="text-xs text-muted-foreground">
+                We mirror this date into a Google Calendar recurring event when you sync.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-1">
+            <Button variant="outline" onClick={() => setShowCycleDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleCycleSave}>Save</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Scan Options Dialog */}
       <Dialog open={showScanOptions} onOpenChange={setShowScanOptions}>
@@ -293,7 +466,7 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
 
       {/* Jan Aushadhi Dialog */}
       <Dialog open={showJanDialog} onOpenChange={setShowJanDialog}>
-        <DialogContent className="sm:max-w-[520px]">
+        <DialogContent className="sm:max-w-[520px] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-emerald-700">💊 Jan Aushadhi Finder</DialogTitle>
             <DialogDescription>

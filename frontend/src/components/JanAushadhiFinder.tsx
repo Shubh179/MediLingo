@@ -60,6 +60,7 @@ const JanAushadhiFinder = () => {
   const [infoText, setInfoText] = useState<string>("");
   const [infoLoading, setInfoLoading] = useState(false);
   const [infoError, setInfoError] = useState<string>("");
+  const [searching, setSearching] = useState(false);
 
   const geminiKey = import.meta.env.VITE_GEMINI_API_KEY;
   const mapsKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -82,10 +83,62 @@ const JanAushadhiFinder = () => {
       .sort((a, b) => (a.dist ?? 0) - (b.dist ?? 0));
   }, [coords]);
 
-  const handleSearch = () => {
-    setSelected(result);
-    setInfoText("");
-    setInfoError("");
+  const handleSearch = async () => {
+    // First check catalog
+    if (result) {
+      setSelected(result);
+      setInfoText("");
+      setInfoError("");
+      return;
+    }
+
+    // If not found in catalog, use Gemini API to find generic
+    if (!geminiKey) {
+      setInfoError("Gemini API key is not configured (VITE_GEMINI_API_KEY).");
+      setSelected(null);
+      return;
+    }
+
+    try {
+      setSearching(true);
+      setInfoError("");
+      const genAI = new GoogleGenerativeAI(geminiKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+      const prompt = `Find the generic medicine equivalent for the brand name "${query.trim()}". Return ONLY a JSON object with this exact format: {"brand": "<brand name>", "generic": "<generic name>", "strength": "<typical strength>", "ingredients": ["<ingredient1>", "<ingredient2>"], "notes": "Available at Jan Aushadhi centers"}. If not found or not a medicine, return: {"error": "Not found"}`;
+      
+      const result = await model.generateContent(prompt);
+      const text = result.response.text().trim();
+      
+      // Extract JSON from markdown code blocks if present
+      let jsonText = text;
+      if (text.includes('```json')) {
+        jsonText = text.split('```json')[1].split('```')[0].trim();
+      } else if (text.includes('```')) {
+        jsonText = text.split('```')[1].split('```')[0].trim();
+      }
+      
+      const data = JSON.parse(jsonText);
+      
+      if (data.error) {
+        setInfoError("Generic medicine not found. Please check the spelling.");
+        setSelected(null);
+      } else {
+        setSelected({
+          brand: data.brand,
+          generic: data.generic,
+          strength: data.strength || "N/A",
+          ingredients: data.ingredients || [],
+          notes: data.notes || "Available at Jan Aushadhi centers"
+        });
+        setInfoText("");
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to find generic medicine";
+      setInfoError(msg);
+      setSelected(null);
+    } finally {
+      setSearching(false);
+    }
   };
 
   const fetchGeminiInfo = async () => {
@@ -167,9 +220,10 @@ const JanAushadhiFinder = () => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="e.g., Augmentin"
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           />
-          <Button onClick={handleSearch} className="gap-2">
-            <Sparkles className="w-4 h-4" />
+          <Button onClick={handleSearch} className="gap-2" disabled={searching}>
+            {searching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
             Find Generic
           </Button>
         </div>
