@@ -4,7 +4,8 @@ import { Ambulance, Droplets, Pill, Camera, Building2, MapPin, CalendarCheck, Tr
 interface ActionSidebarProps {
   onAmbulance: () => void;
   onBloodBank: () => void;
-  onJanAushadhi: () => void;
+  onGenericStores: () => void;
+  onCompareMedicines: () => void;
   onScanPrescription: () => void;
   onNearbyHospitals: () => void;
   onNearbyPharmacies: () => void;
@@ -15,7 +16,8 @@ interface ActionSidebarProps {
 const ActionSidebar = ({
   onAmbulance,
   onBloodBank,
-  onJanAushadhi,
+  onGenericStores,
+  onCompareMedicines,
   onScanPrescription,
   onNearbyHospitals,
   onNearbyPharmacies,
@@ -26,7 +28,8 @@ const ActionSidebar = ({
   const items = [
     { label: "Ambulance", icon: <Ambulance className="w-4 h-4" />, onClick: onAmbulance, accent: "red" },
     { label: "Blood Bank", icon: <Droplets className="w-4 h-4" />, onClick: onBloodBank, accent: "rose" },
-    { label: "Jan Aushadhi", icon: <Pill className="w-4 h-4" />, onClick: onJanAushadhi, accent: "emerald" },
+    { label: "Generic Stores", icon: <Pill className="w-4 h-4" />, onClick: onGenericStores, accent: "emerald" },
+    { label: "Compare Medicines", icon: <Camera className="w-4 h-4" />, onClick: onCompareMedicines, accent: "primary" },
     { label: "Scan Prescription", icon: <Camera className="w-4 h-4" />, onClick: onScanPrescription, accent: "primary" },
     { label: "Nearby Hospitals", icon: <Building2 className="w-4 h-4" />, onClick: onNearbyHospitals, accent: "primary" },
     { label: "Nearby Pharmacies", icon: <MapPin className="w-4 h-4" />, onClick: onNearbyPharmacies, accent: "primary" },

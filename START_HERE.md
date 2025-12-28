@@ -43,10 +43,22 @@ Replace `your_api_key_here` with your actual key from Google AI
 - "Show my dose history"
 - "What medicines do I have?"
 
+✅ **Medicine Comparison**
+- Open the sidebar → "Compare Medicines"
+- Enter a brand name to see exact-composition alternatives, sorted by price
+- Open directions to nearby generic medicine stores
+
+⚠️ Data requirement: place CSV at [frontend/public/data/indian_medicine_data.csv](frontend/public/data/indian_medicine_data.csv)
+- Source file provided in [data/indian_medicine_data.csv](data/indian_medicine_data.csv)
+- The frontend fetches from `/data/indian_medicine_data.csv`
+
 ## 📁 File Created
 - `.env.local` ← Create this file with your API key
 - `SETUP_GEMINI.md` ← Full setup guide
 - `geminiService.ts` ← Gemini integration
 - Updated `AdvancedChatbot.tsx` ← New AI chatbot
+ - New `MedicineComparator.tsx` ← Compare medicines by composition and price
+ - New `GenericStoreFinder.tsx` ← Open directions to nearby generic stores
+ - New `medicineDataService.ts` ← CSV loader and utilities
 
 Ready to chat? Just add your API key! 💊✨

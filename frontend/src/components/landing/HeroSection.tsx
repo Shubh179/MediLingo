@@ -19,7 +19,9 @@ import PharmacyFinder from "@/components/PharmacyFinder";
 import { HospitalFinder } from "@/components/HospitalFinder";
 import AmbulanceFinder from "@/components/AmbulanceFinder";
 import BloodBankFinder from "@/components/BloodBankFinder";
-import JanAushadhiFinder from "@/components/JanAushadhiFinder";
+// JanAushadhiFinder removed per requirements
+import GenericStoreFinder from "@/components/GenericStoreFinder";
+import MedicineComparator from "@/components/MedicineComparator";
 import BookAppointment from "@/components/BookAppointment";
 import MedicineDelivery from "@/components/MedicineDelivery";
 import ActionSidebar from "./ActionSidebar";
@@ -40,7 +42,8 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
   const [showPharmacyDialog, setShowPharmacyDialog] = useState(false);
   const [showAmbulanceDialog, setShowAmbulanceDialog] = useState(false);
   const [showBloodBankDialog, setShowBloodBankDialog] = useState(false);
-  const [showJanDialog, setShowJanDialog] = useState(false);
+  const [showGenericDialog, setShowGenericDialog] = useState(false);
+  const [showComparatorDialog, setShowComparatorDialog] = useState(false);
   const [showAppointmentDialog, setShowAppointmentDialog] = useState(false);
   const [showDeliveryDialog, setShowDeliveryDialog] = useState(false);
   const [autoStartVoice, setAutoStartVoice] = useState(false);
@@ -109,8 +112,12 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
     setShowBloodBankDialog(true);
   };
 
-  const openJanAushadhiFinder = () => {
-    setShowJanDialog(true);
+  const openGenericStores = () => {
+    setShowGenericDialog(true);
+  };
+
+  const openComparator = () => {
+    setShowComparatorDialog(true);
   };
 
   const openAppointmentDialog = () => {
@@ -129,7 +136,8 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
             <ActionSidebar
               onAmbulance={openAmbulanceFinder}
               onBloodBank={openBloodBankFinder}
-              onJanAushadhi={openJanAushadhiFinder}
+              onGenericStores={openGenericStores}
+              onCompareMedicines={openComparator}
               onScanPrescription={handleScanClick}
               onNearbyHospitals={openHospitalFinder}
               onNearbyPharmacies={openPharmacyFinder}
@@ -291,16 +299,29 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
         </DialogContent>
       </Dialog>
 
-      {/* Jan Aushadhi Dialog */}
-      <Dialog open={showJanDialog} onOpenChange={setShowJanDialog}>
-        <DialogContent className="sm:max-w-[520px] max-h-[85vh] overflow-y-auto">
+      {/* Generic Store Finder Dialog */}
+      <Dialog open={showGenericDialog} onOpenChange={setShowGenericDialog}>
+        <DialogContent className="sm:max-w-[520px]">
           <DialogHeader>
-            <DialogTitle className="text-emerald-700">💊 Jan Aushadhi Finder</DialogTitle>
+            <DialogTitle className="text-emerald-700">💊 Generic Medicine Stores</DialogTitle>
             <DialogDescription>
-              Find low-cost generic alternatives and nearby Jan Aushadhi stores.
+              Find nearby generic medicine stores and open directions.
             </DialogDescription>
           </DialogHeader>
-          <JanAushadhiFinder />
+          <GenericStoreFinder />
+        </DialogContent>
+      </Dialog>
+
+      {/* Medicine Comparator Dialog */}
+      <Dialog open={showComparatorDialog} onOpenChange={setShowComparatorDialog}>
+        <DialogContent className="sm:max-w-[920px] max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-primary">🔍 Medicine Comparison</DialogTitle>
+            <DialogDescription>
+              Compare your medicine with alternatives by composition and price.
+            </DialogDescription>
+          </DialogHeader>
+          <MedicineComparator />
         </DialogContent>
       </Dialog>
 
