@@ -22,10 +22,11 @@ export default function DoctorChat({ isOpen, onClose }: { isOpen: boolean; onClo
     if (!isOpen) return;
     if (agentRef.current) agentRef.current.innerHTML = "";
     const iframe = document.createElement("iframe");
-    iframe.src = "https://bey.chat/be966085-8929-4d72-baa2-0ae3ccaa054c";
+    iframe.src = "https://bey.chat/1f5046d2-4965-4580-8d39-48ced5e17b58";
     iframe.style.width = "100%";
     iframe.style.height = "400px";
     iframe.style.border = "none";
+    iframe.style.maxWidth = "100%";
     iframe.allow = "camera; microphone; fullscreen";
     iframe.allowFullscreen = true;
     agentRef.current.appendChild(iframe);
