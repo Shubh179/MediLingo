@@ -1,7 +1,7 @@
 import { Camera, Sparkles, MessageCircle, Upload, Video, MapPin, Building2, Ambulance, Droplets, Pill, CalendarCheck, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PrescriptionCard from "./PrescriptionCard";
 import PrescriptionUpload from "./PrescriptionUpload";
 import CameraCapture from "@/components/CameraCapture";
@@ -26,6 +26,11 @@ import BookAppointment from "@/components/BookAppointment";
 import MedicineDelivery from "@/components/MedicineDelivery";
 import ActionSidebar from "./ActionSidebar";
 import DoctorChat from "@/components/DoctorChat";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useMenstrualCycle } from "@/contexts/MenstrualCycleContext";
 
 interface HeroSectionProps {
   onScanClick: () => void;
@@ -48,7 +53,118 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
   const [showDeliveryDialog, setShowDeliveryDialog] = useState(false);
   const [autoStartVoice, setAutoStartVoice] = useState(false);
   const [showDoctorChat, setShowDoctorChat] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { settings, status, updateSettings, syncToGoogleCalendar } = useMenstrualCycle();
+  const [showCycleDialog, setShowCycleDialog] = useState(false);
+  const [cycleForm, setCycleForm] = useState({
+    periodDuration: settings.periodDuration,
+    cycleLength: settings.cycleLength,
+    lastPeriodStart: settings.lastPeriodStart ? new Date(settings.lastPeriodStart) : null,
+  });
+  const { isAuthenticated, user } = useAuth();
+  const [sharedProfiles, setSharedProfiles] = useState<Array<{id: string; name: string; age?: number}>>([]);
+  const [selectedSharedProfile, setSelectedSharedProfile] = useState<{id: string; name: string} | null>(null);
+  const [sharedLoading, setSharedLoading] = useState(false);
+  const [sharedData, setSharedData] = useState<{ user?: { id: string; name: string }; cycle?: any } | null>(null);
+  const [redeemOpen, setRedeemOpen] = useState(false);
+  const [redeemCode, setRedeemCode] = useState('');
+  const [redeeming, setRedeeming] = useState(false);
+
+  useEffect(() => {
+    setCycleForm({
+      periodDuration: settings.periodDuration,
+      cycleLength: settings.cycleLength,
+      lastPeriodStart: settings.lastPeriodStart ? new Date(settings.lastPeriodStart) : null,
+    });
+  }, [settings]);
+
+  // Load shared profiles for male users
+  useEffect(() => {
+    const loadSharedProfiles = async () => {
+      if (user?.gender !== 'Male') return;
+      try {
+        const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5001';
+        const resp = await fetch(`${API_BASE_URL}/api/share/profiles`, { credentials: 'include' });
+        if (resp.ok) {
+          const data = await resp.json();
+          setSharedProfiles(data?.profiles || []);
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+    loadSharedProfiles();
+  }, [user?.gender]);
+
+  // Fetch shared cycle when a profile is selected
+  useEffect(() => {
+    const fetchSharedCycle = async () => {
+      if (!selectedSharedProfile) { setSharedData(null); return; }
+      setSharedLoading(true);
+      try {
+        const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5001';
+        const resp = await fetch(`${API_BASE_URL}/api/cycle/shared/${selectedSharedProfile.id}`, { credentials: 'include' });
+        if (resp.ok) {
+          const data = await resp.json();
+          setSharedData({ user: data.user, cycle: data.cycle });
+        } else {
+          setSharedData(null);
+        }
+      } catch {
+        setSharedData(null);
+      } finally {
+        setSharedLoading(false);
+      }
+    };
+    fetchSharedCycle();
+  }, [selectedSharedProfile]);
+
+  const handleCycleSave = async () => {
+    if (!cycleForm.lastPeriodStart) {
+      toast({
+        title: "Choose start date",
+        description: "Use the Google Calendar picker to anchor your cycle.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    updateSettings({
+      periodDuration: Number(cycleForm.periodDuration) || settings.periodDuration,
+      cycleLength: Number(cycleForm.cycleLength) || settings.cycleLength,
+      lastPeriodStart: cycleForm.lastPeriodStart.toISOString(),
+    });
+    // Persist to backend so shared viewers can see data
+    try {
+      const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5001';
+      await fetch(`${API_BASE_URL}/api/cycle/me`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          periodDuration: Number(cycleForm.periodDuration),
+          cycleLength: Number(cycleForm.cycleLength),
+          lastPeriodStart: cycleForm.lastPeriodStart.toISOString(),
+        }),
+      });
+    } catch (e) {
+      console.warn('Failed to persist cycle to backend', e);
+    }
+    setShowCycleDialog(false);
+    toast({ title: "Cycle saved", description: "Countdown refreshed and ready to sync." });
+  };
+
+  const handleGoogleSync = () => {
+    const url = syncToGoogleCalendar();
+    if (!url) {
+      toast({
+        title: "Add your cycle first",
+        description: "Save last period start to generate the calendar event.",
+        variant: "destructive",
+      });
+      return;
+    }
+    toast({ title: "Google Calendar", description: "Opening your recurring event in a new tab." });
+  };
 
   const ensureLoggedIn = () => {
     if (!isAuthenticated) {
@@ -156,6 +272,97 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
         <div className="absolute bottom-32 right-10 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl animate-pulse delay-700"></div>
       </div>
 
+      {/* Menstrual Cycle Tracker - Top Right (moved down 35%) - Only for Female users */}
+      {user?.gender === 'Female' && (
+      <div className="absolute top-16 right-5 z-20 fade-up max-w-sm" style={{ animationDelay: "0.1s" }}>
+        <div className="card-elevated border border-primary/30 bg-primary/5 p-4 md:p-5 rounded-3xl flex flex-col gap-3">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-primary">Menstrual Cycle Tracker</p>
+              <h3 className="text-lg font-bold text-foreground leading-tight">{status.countdownLabel}</h3>
+              <p className="text-xs text-muted-foreground mt-1">
+                {status.nextPeriodStart
+                  ? `Next window starts ${status.nextPeriodStart.toLocaleDateString()}${status.nextPeriodEnd ? ` • ends ${status.nextPeriodEnd.toLocaleDateString()}` : ""}`
+                  : "Save your cycle to start live countdowns."}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 text-xs text-foreground/80">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white border border-primary/20 shadow-sm">
+              <CalendarCheck className="w-3.5 h-3.5 text-primary" />
+              <span>{status.isDelayed ? "Delayed" : "On track"}</span>
+            </div>
+            {settings.lastPeriodStart && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white border border-border/80 text-muted-foreground">
+                <Droplets className="w-3.5 h-3.5 text-rose-500" />
+                {new Date(settings.lastPeriodStart).toLocaleDateString()}
+              </span>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Button
+              onClick={() => setShowCycleDialog(true)}
+              className="rounded-full bg-primary hover:bg-primary/90 text-white px-4 py-2 h-auto text-sm w-full"
+            >
+              Add Menstrual Cycle
+            </Button>
+            <Button
+              className="rounded-full bg-secondary hover:bg-secondary/90 text-white px-4 py-2 h-auto text-sm w-full"
+              onClick={handleGoogleSync}
+              disabled={!status.nextPeriodStart}
+            >
+              Sync with Google Calendar
+            </Button>
+          </div>
+        </div>
+      </div>
+      )}
+
+      {/* Shared Profiles - visible to Male users */}
+      {user?.gender === 'Male' && (
+        <div className="absolute top-16 right-5 z-20 fade-up max-w-sm" style={{ animationDelay: '0.15s' }}>
+          <div className="card-elevated border border-secondary/30 bg-secondary/5 p-4 md:p-5 rounded-3xl flex flex-col gap-3">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-secondary">Shared Profiles</p>
+                <p className="text-xs text-muted-foreground mt-1">You have access to these profiles</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              {sharedProfiles.length === 0 && (
+                <p className="text-xs text-muted-foreground">No profiles linked yet. Ask for a sharing code.</p>
+              )}
+              {sharedProfiles.map((p) => (
+                <div key={p.id} className="flex items-center justify-between px-3 py-2 rounded-lg bg-white border border-border/80">
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">{p.name}</p>
+                    {p.age && <p className="text-xs text-muted-foreground">Age {p.age}</p>}
+                  </div>
+                  <Button
+                    className="rounded-full bg-secondary hover:bg-secondary/90 text-white px-3 py-1 h-auto text-xs"
+                    onClick={() => setSelectedSharedProfile({ id: p.id, name: p.name })}
+                  >
+                    View
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <div>
+              <Button
+                className="rounded-full bg-secondary hover:bg-secondary/90 text-white px-4 py-2 h-auto text-sm w-full"
+                onClick={() => setRedeemOpen(true)}
+              >
+                Redeem Sharing Code
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
       <div className="relative z-10 flex-1 flex flex-col items-center justify-start pt-4 md:pt-6 pb-4 max-w-4xl mx-auto w-full">
         {/* Prescription Upload Component */}
         <div className="w-full mb-4 fade-up" style={{ animationDelay: "0.1s" }}>
@@ -200,7 +407,7 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
         <div className="w-full max-w-2xl mx-auto mb-3 fade-up" style={{ animationDelay: "0.19s" }}>
           <Button
             onClick={() => setShowDoctorChat(true)}
-            className="w-full flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full py-3 px-6 text-lg font-semibold shadow-md"
+            className="w-full flex items-center gap-3 bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-full py-3 px-6 text-lg font-semibold shadow-md"
           >
             <img src="https://cdn-icons-png.flaticon.com/512/387/387561.png" alt="Doctor" className="w-7 h-7 rounded-full border-2 border-white bg-white mr-2" />
             Consult a Doctor
@@ -211,6 +418,201 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
 
         {/* Removed quick action chips; available in sidebar */}
       </div>
+
+      {/* Shared Profile Viewer Dialog */}
+      <Dialog open={!!selectedSharedProfile} onOpenChange={(open) => !open && setSelectedSharedProfile(null)}>
+        <DialogContent className="sm:max-w-[520px]">
+          <DialogHeader>
+            <DialogTitle>Viewing Shared Profile</DialogTitle>
+            <DialogDescription>
+              Read-only cycle calendar and symptoms for {selectedSharedProfile?.name}
+            </DialogDescription>
+          </DialogHeader>
+            <div className="space-y-4">
+              {sharedLoading && (
+                <div className="rounded-xl border border-border bg-white px-4 py-3 text-sm text-muted-foreground">
+                  Loading shared data…
+                </div>
+              )}
+
+              {!sharedLoading && (!sharedData || !sharedData.cycle) && (
+                <div className="rounded-xl border border-dashed border-border bg-white px-4 py-3 text-sm text-muted-foreground">
+                  No cycle data saved yet.
+                </div>
+              )}
+
+              {!sharedLoading && sharedData?.cycle && (
+                <div className="space-y-3">
+                  <div className="rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-semibold text-primary">Settings</p>
+                      <span className="text-[11px] text-primary/70 uppercase tracking-wide">Synced</span>
+                    </div>
+                    <div className="mt-2 grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                      <div className="rounded-lg bg-white/70 px-3 py-2 border border-primary/10">
+                        <p className="font-semibold text-foreground">{sharedData.cycle.settings?.periodDuration ?? '-'} days</p>
+                        <p className="text-[11px] text-muted-foreground">Period</p>
+                      </div>
+                      <div className="rounded-lg bg-white/70 px-3 py-2 border border-primary/10">
+                        <p className="font-semibold text-foreground">{sharedData.cycle.settings?.cycleLength ?? '-'} days</p>
+                        <p className="text-[11px] text-muted-foreground">Cycle</p>
+                      </div>
+                      <div className="rounded-lg bg-white/70 px-3 py-2 border border-primary/10 col-span-2">
+                        <p className="font-semibold text-foreground">{sharedData.cycle.settings?.lastPeriodStart ? new Date(sharedData.cycle.settings.lastPeriodStart).toLocaleDateString() : '—'}</p>
+                        <p className="text-[11px] text-muted-foreground">Last start</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-secondary/20 bg-secondary/5 px-4 py-3 shadow-sm">
+                    <p className="text-sm font-semibold text-secondary">Recent Symptoms</p>
+                    {sharedData.cycle.symptomLogs?.length ? (
+                      <ul className="mt-2 space-y-2 text-xs text-muted-foreground">
+                        {sharedData.cycle.symptomLogs.slice(-5).reverse().map((log: any, idx: number) => (
+                          <li key={idx} className="rounded-lg bg-white/70 border border-secondary/10 px-3 py-2 flex justify-between gap-3">
+                            <span className="font-semibold text-foreground">{new Date(log.date).toLocaleDateString()}</span>
+                            <span className="text-right">{(log.symptoms || []).join(', ') || '—'}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="mt-2 text-xs text-muted-foreground">No symptoms recorded.</p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Redeem Sharing Code Dialog */}
+      <Dialog open={redeemOpen} onOpenChange={setRedeemOpen}>
+        <DialogContent className="sm:max-w-[420px]">
+          <DialogHeader>
+            <DialogTitle>Redeem Sharing Code</DialogTitle>
+            <DialogDescription>Enter the 8-character code shared with you.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <Label htmlFor="redeemCode">Sharing Code</Label>
+            <Input
+              id="redeemCode"
+              placeholder="e.g. ABCD1234"
+              value={redeemCode}
+              onChange={(e) => setRedeemCode(e.target.value.toUpperCase())}
+              maxLength={8}
+            />
+            <Button
+              disabled={redeeming || redeemCode.length !== 8}
+              onClick={async () => {
+                setRedeeming(true);
+                try {
+                  const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5001';
+                  const resp = await fetch(`${API_BASE_URL}/api/share/access`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ sharingCode: redeemCode }),
+                  });
+                  if (resp.ok) {
+                    const data = await resp.json();
+                    setRedeemOpen(false);
+                    setRedeemCode('');
+                    // Refresh shared profiles
+                    const listResp = await fetch(`${API_BASE_URL}/api/share/profiles`, { credentials: 'include' });
+                    if (listResp.ok) {
+                      const listData = await listResp.json();
+                      setSharedProfiles(listData?.profiles || []);
+                    }
+                  } else {
+                    // Show basic alert; could use toast
+                    alert('Invalid or expired code.');
+                  }
+                } finally {
+                  setRedeeming(false);
+                }
+              }}
+              className="rounded-full bg-secondary hover:bg-secondary/90 text-white px-4 py-2 h-auto text-sm w-full"
+            >
+              {redeeming ? 'Redeeming...' : 'Redeem'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Menstrual Cycle Dialog */}
+      <Dialog open={showCycleDialog} onOpenChange={setShowCycleDialog}>
+        <DialogContent className="sm:max-w-[520px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Droplets className="w-5 h-5 text-rose-500" /> Add Menstrual Cycle
+            </DialogTitle>
+            <DialogDescription>
+              Save your cycle settings, pick the last period start with the Google Calendar date picker, and sync recurring reminders.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-4 pt-2">
+            <div className="grid gap-2">
+              <Label htmlFor="periodDuration">Period duration (days)</Label>
+              <Input
+                id="periodDuration"
+                type="number"
+                min={1}
+                max={14}
+                value={cycleForm.periodDuration}
+                onChange={(e) => setCycleForm((prev) => ({ ...prev, periodDuration: Number(e.target.value) }))}
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="cycleLength">Cycle length (days)</Label>
+              <Input
+                id="cycleLength"
+                type="number"
+                min={15}
+                max={60}
+                value={cycleForm.cycleLength}
+                onChange={(e) => setCycleForm((prev) => ({ ...prev, cycleLength: Number(e.target.value) }))}
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label>Last period start (Google Calendar)</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal"
+                  >
+                    <CalendarCheck className="w-4 h-4 mr-2" />
+                    {cycleForm.lastPeriodStart
+                      ? cycleForm.lastPeriodStart.toLocaleDateString()
+                      : "Choose date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={cycleForm.lastPeriodStart ?? undefined}
+                    onSelect={(value) => setCycleForm((prev) => ({ ...prev, lastPeriodStart: value ?? prev.lastPeriodStart }))}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              <p className="text-xs text-muted-foreground">
+                We mirror this date into a Google Calendar recurring event when you sync.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-1">
+            <Button variant="outline" onClick={() => setShowCycleDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleCycleSave}>Save</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Scan Options Dialog */}
       <Dialog open={showScanOptions} onOpenChange={setShowScanOptions}>

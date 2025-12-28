@@ -1,0 +1,591 @@
+Disease,Severity_Score
+"Tuberculosis, HIV infected",0.408459204299999
+"Tuberculosis, HIV infected and anemia, mild",0.41069636034036
+"Tuberculosis, HIV infected and anemia, moderate",0.438663209985437
+"Tuberculosis, HIV infected and anemia, severe",0.494827003652249
+"HIV cases, symptomatic, pre-AIDS",0.2744787049
+"AIDS cases, not receiving ARV treatment",0.58159009
+Generic uncomplicated disease: anxiety about diagnosis,0.0124408307999999
+"Anemia, mild; Generic uncomplicated disease anxiety",0.0160833307242591
+"Anemia, moderate; Generic uncomplicated disease anxiety",0.063305862468731
+"Anemia, severe; Generic uncomplicated disease anxiety",0.15932514528591
+"HIV cases, symptomatic, pre-AIDS and anemia, mild",0.277181218177812
+"HIV cases, symptomatic, pre-AIDS and anemia, moderate",0.311585318509671
+"HIV cases, symptomatic, pre-AIDS and anemia, severe",0.381147624050404
+"AIDS cases, not receiving ARV treatment and anemia, mild",0.583216266964975
+"AIDS cases, not receiving ARV treatment and anemia, moderate",0.602912609524611
+"AIDS cases, not receiving ARV treatment and anemia, severe",0.642019050453207
+"HIV/AIDS cases, receiving ARV treatment",0.0780173292
+"HIV/AIDS cases, receiving ARV treatment and anemia, mild",0.0814133163087075
+"HIV/AIDS cases, receiving ARV treatment and anemia, moderate",0.125392636046685
+"HIV/AIDS cases, receiving ARV treatment and anemia, severe",0.214818632701928
+Asymptomatic,0.0
+"Infectious disease, acute episode, moderate ",0.0505949457999999
+"Motor plus cognitive impairments, moderate",0.2029460135
+"Disfigurement, level 1",0.0110162523999999
+"Hearing loss, unilateral",0.0079861649
+"Infectious disease, acute episode, mild",0.00578649719999999
+"Disfigurement, level 3",0.404790537
+"Moderate motor plus cognitive impairments and moderate infectious disease, acute episode",0.243027149563931
+"Level 3 disfigurement and moderate infectious disease, acute episode",0.434622571702027
+Level 3 disfigurement and moderate motor plus cognitive impairments,0.523209748983538
+"Level 3 disfigurement, moderate motor plus cognitive impairments, and moderate infectious disease, acute episode",0.546965949010242
+Epididymo-orchitis,0.128124532799999
+"Infertility, primary",0.0075640454
+"Infertility, secondary",0.00514515299999999
+"Abdominopelvic problem, moderate",0.114339967
+"Abdominopelvic problem, severe",0.324246550799999
+"Post-COMO calculation for residuals (YLL/YLD ratio, other methods)",
+"Tuberculosis, not HIV infected",0.3326206579
+Spinal cord lesion below neck level (treated),0.296164846699999
+"Infectious disease, acute episode, severe",0.1334115188
+Ear pain,0.0133199734999999
+"Hearing loss, mild",0.0095578866
+"Hearing loss, moderate",0.0265751711999999
+"Hearing loss, mild, with ringing",0.0214314290999999
+"Hearing loss, moderate, with ringing",0.0739630359999999
+Vertigo with mild hearing loss,0.121816065461137
+Vertigo with moderate hearing loss,0.136839321367873
+Vertigo with mild hearing loss and ringing,0.132301573369912
+Vertigo with moderate hearing loss and ringing,0.178666460289353
+"Diarrhea, mild",0.0735369638999999
+"Diarrhea, moderate",0.1878741985
+"Diarrhea, severe",0.2470957725
+Gastric bleeding,0.324803941499999
+"Infectious disease, acute episode, mild, with mild anemia",0.00945645888851624
+"Infectious disease, acute episode, mild, with moderate anemia",0.0570109038963666
+"Infectious disease, acute episode, mild, with severe anemia",0.15368270742169
+"Infectious disease, acute episode, moderate, with mild anemia",0.0540912769231853
+"Infectious disease, acute episode, moderate, with moderate anemia",0.0994212308427917
+"Infectious disease, acute episode, moderate, with severe anemia",0.191620198246489
+"Infectious disease, acute episode, severe, with mild anemia",0.136608729508858
+"Infectious disease, acute episode, severe, with moderate anemia",0.177867946714338
+"Infectious disease, acute episode, severe, with severe anemia",0.261675380663221
+"Anemia, mild",0.00369639789999999
+"Anemia, moderate",0.0515419615
+"Anemia, severe",0.148766153
+"Motor impairment, moderate",0.0608338594999999
+Moderate motor impairment with blindness,0.236485315448987
+Moderate motor impairment with epilepsy,
+Moderate motor impairment with blindness and epilepsy,
+"Motor impairment, severe",0.401610537999999
+Severe motor impairment with blindness,0.511547969628648
+Severe motor impairment with epilepsy,
+Moderate motor plus cognitive impairment with blindness,0.351038029447393
+Moderate motor plus cognitive impairment with epilepsy,
+Moderate motor plus cognitive impairment with blindness and epilepsy,
+Severe motor impairment with blindness and epilepsy,
+Severe motor plus cognitive impairment with blindness,0.625077679114418
+Severe motor plus cognitive impairment with epilepsy,
+Severe motor plus cognitive impairment with blindness and epilepsy,
+Cardiac conduction disorders and cardiac dysrhythmias,0.224156355
+"Heart failure, mild",0.0414518940999999
+"Heart failure, moderate",0.0716534326999999
+"Heart failure, severe",0.1790666962
+"Abdominopelvic problem, mild",0.0110092495999999
+Generic uncomplicated disease: worry and daily medication,0.0490114147
+"Disfigurement, level 2",0.0669917538
+"Disfigurement, level 1 with itch/pain",0.0265175039
+"Motor plus cognitive impairments, severe",0.5416677713
+Epilepsy,
+"COPD and other chronic respiratory problems, mild",0.0193167207999999
+"Lymphatic filariasis, symptomatic",0.108583132899999
+"Disfigurement, level 2, with itch/pain",0.188087468699999
+"Distance vision, moderate impairment",0.0308421263999999
+"Distance vision, severe impairment",0.1840484878
+Distance vision blindness,0.1873645834
+"Infectious disease, post-acute consequences (fatigue, emotional lability, insomnia)",0.218848731399999
+"Intestinal nematode infections, symptomatic",0.0265582283999999
+Severe wasting,0.1276538957
+"COPD and other chronic respiratory problems, moderate",0.2251717079
+"COPD and other chronic respiratory problems, severe",0.407857976799999
+"Musculoskeletal problems, lower limbs, moderate",0.0786707070999998
+Attention deficit hyperactivity disorder,0.0445303985999999
+Borderline intellectual functioning,0.0107930086
+"Intellectual disability / mental retardation, mild",0.0425405801999999
+"Hearing loss, severe",0.1583974349
+"Hearing loss, profound",0.2039397084
+"Hearing loss, complete",0.214834670199999
+"Hearing loss, severe, with ringing",0.2608670825
+"Hearing loss, profound, with ringing",0.2773206981
+"Hearing loss, complete, with ringing",0.3158013573
+"Motor impairment, mild",0.0101407174
+"Motor plus cognitive impairments, mild",0.0311646785
+"Hearing loss, moderately severe",0.09248630305
+"Hearing loss, moderately severe, with ringing",0.16741505925
+"Distance vision, monocular",0.0165468027
+Herpes zoster,0.0577660135
+"Tension-type headaches, mild motor plus cognitive impairment",0.0671622698516506
+"Moderate abdominal pain, tension-type headaches, mild motor plus cognitive impairment",0.173592709453988
+Moderate abdominal pain and severe epilepsy,0.602010588449275
+Rectovaginal fistula,0.5012423231
+Vesicovaginal fistula,0.341697782099999
+"Distance vision, mild impairment",0.0030370671
+Kwashiorkor,0.0509874241
+Kwashiorkor and severe wasting,0.171946491229287
+"Intellectual disability / mental retardation, profound and Iodine-deficiency goiter",0.357911082660171
+"Intellectual disability / mental retardation, severe and Iodine-deficiency goiter",0.3259027477635
+"Cancer, diagnosis and primary therapy ",0.2875011801
+"Cancer, metastatic",0.4513611172
+"Terminal phase, with medication (for cancers, end-stage kidney/liver disease)",0.539560491899999
+Stoma,0.0951031172999999
+Stoma and generic medication,0.139297301872267
+"Terminal phase, without medication (for cancers, end-stage kidney/liver disease)",0.568502387999999
+Speech problems,0.0510992143
+Speech problems and generic medication,0.0975013698488104
+"Disfigurement, level 3, with itch/pain",0.5763168282
+Mastectomy,0.0355751118
+Mastectomy and generic medication,0.0827607225988488
+Impotence and generic medication,0.0654531897314615
+Incontinence and generic medication,0.181133560327728
+Urinary incontinence,0.1391354587
+Impotence,0.0173388969
+"Angina pectoris, mild",0.0331917431
+"Angina pectoris, moderate",0.0795039955000001
+"Angina pectoris, severe",0.1668826617
+"Acute myocardial infarction, days 1-2",0.4322702155
+"Acute myocardial infarction, days 3-28",0.0741002145999999
+"Stroke, long-term consequences, mild",0.0190102814
+"Stroke, long-term consequences, moderate",0.0700598348999999
+"Stroke, long-term consequences, moderate and Generic uncomplicated disease: worry and daily medication",0.115506996712234
+"Stroke, long-term consequences, moderate; Heart failure, mild",0.10849538907589
+"Stroke, long-term consequences, moderate; Heart failure, moderate",0.13651289717948
+"Stroke, long-term consequences, moderate; Heart failure, severe",0.236222262269112
+"Stroke, long-term consequences, moderate plus cognition problems",0.3163443026
+"Stroke, long-term consequences, moderate plus cognition problems and Generic uncomplicated disease: worry and daily medication",0.349592098328486
+"Stroke, long-term consequences, moderate plus cognition problems; Heart failure, mild",0.344491309849307
+"Stroke, long-term consequences, moderate plus cognition problems; Heart failure, moderate",0.364816372766076
+"Stroke, long-term consequences, moderate plus cognition problems; Heart failure, severe",0.437017027175268
+"Stroke, long-term consequences, severe",0.5520013925
+"Stroke, long-term consequences, severe and Generic uncomplicated disease: worry and daily medication",0.573753265598628
+"Stroke, long-term consequences, severe; Heart failure, mild",0.570452211688014
+"Stroke, long-term consequences, severe; Heart failure, moderate",0.583555823582883
+"Stroke, long-term consequences, severe; Heart failure, severe",0.629891660680753
+"Stroke, long-term consequences, severe plus cognition problems",0.5875458344
+"Stroke, long-term consequences, severe plus cognition problems and Generic uncomplicated disease: worry and daily medication",0.607570014093948
+"Stroke, long-term consequences, severe plus cognition problems; Heart failure, mild",0.604535787675755
+"Stroke, long-term consequences, severe plus cognition problems; Heart failure, moderate",0.616569518087146
+"Stroke, long-term consequences, severe plus cognition problems; Heart failure, severe",0.659060969917072
+Claudication,0.0141852508
+"Severe COPD and other chronic respiratory, with mild heart failure",0.432223678881254
+"Severe COPD and other chronic respiratory, with moderate heart failure",0.449726082941836
+"Severe COPD and other chronic respiratory, with severe heart failure",0.511808264914019
+"COPD and other chronic respiratory problems, severe and generic uncomplicated disease: worry and daily medication",0.43662301570499
+"Asthma, controlled",0.0145813465
+"Asthma, partially controlled",0.0355050781
+"Asthma, uncontrolled",0.132692258399999
+"Decompensated cirrhosis of the liver, Generic uncomplicated disease: worry and daily medication",0.218262336010088
+"Decompensated cirrhosis of the liver; Heart failure, mild",0.212090581573509
+"Decompensated cirrhosis of the liver; Heart failure, moderate",0.236717035797584
+"Decompensated cirrhosis of the liver; Heart failure, severe",0.324319363227806
+Decompensated cirrhosis of the liver ,0.178202515
+Decompensated cirrhosis of the liver and mild anemia,0.181242186476127
+Decompensated cirrhosis of the liver and moderate anemia,0.220320692954307
+Decompensated cirrhosis of the liver and severe anemia,0.29960279123152
+"Abdominopelvic problem, severe and mild anemia",0.326776744073247
+"Abdominopelvic problem, severe and moderate anemia",0.358787478319833
+"Abdominopelvic problem, severe and severe anemia",0.423364416242141
+Mild abdominal pain with mild anemia,0.0146575536844582
+Mild abdominal pain with moderate anemia,0.0619509455734975
+Mild abdominal pain with severe anemia,0.158110748547652
+Moderate abdominal pain with mild anemia,0.117605201967207
+Moderate abdominal pain with moderate anemia,0.15980206170405
+"Gastric bleeding and anemia, mild",0.327330892616285
+"Gastric bleeding and anemia, moderate",0.359299851681481
+"Gastric bleeding and anemia, severe",0.423789255076229
+Moderate abdominal pain with severe anemia,0.245552712819765
+Often has a burning sensation in the back of the chest after eating,0.0263735870999999
+"Crohn disease or ulcerative colitis, mild anemia",0.233748694896018
+"Crohn disease or ulcerative colitis, moderate anemia",0.270264475862003
+"Crohn disease or ulcerative colitis, severe anemia",0.344218576826906
+Crohn disease or ulcerative colitis,0.2308938722
+"Infectious disease, acute episode, severe and abdominopelvic problem, severe",0.413154670494099
+"Dementia, mild",0.0691408628000001
+"Dementia, moderate",0.376894274299999
+"Dementia, severe",0.448573711
+"Parkinson disease, mild",0.0099332631
+"Parkinson disease, moderate",0.2671785045
+"Parkinson disease, severe",0.5750796266
+"Epilepsy, seizures >= once a month",0.552046203099999
+"Epilepsy, seizures 1-11 per year",0.2626434033
+"Multiple sclerosis, mild",0.182609825
+"Multiple sclerosis, moderate",0.4634399066
+"Multiple sclerosis, severe",0.719005913199998
+Mild motor impairment with mild respiratory problems and speech problems,0.0787649056250969
+Mild motor impairment with moderate respiratory problems and speech problems,0.271946676128462
+Mild motor impairment with severe respiratory problems and speech problems,0.443565566341036
+Moderate motor impairment with mild respiratory problems and speech problems,0.125819253102691
+Moderate motor impairment with moderate respiratory problems and speech problems,0.308842497797807
+Moderate motor impairment with severe respiratory problems and speech problems,0.471556218459913
+Severe motor impairment with mild respiratory problems and speech problems,0.442860496396542
+Severe motor impairment with moderate respiratory problems and speech problems,0.557146185904331
+Severe motor impairment with severe respiratory problems and speech problems,0.658957092762882
+Mild motor impairment and mild respiratory problems,0.0789207729211227
+Mild motor impairment and moderate respiratory problems,0.271968441488603
+Mild motor impairment and severe respiratory problems,0.443454236732008
+Moderate motor impairment and mild respiratory problems,0.0292410928701262
+Moderate motor impairment and moderate respiratory problems,0.233025640133469
+Moderate motor impairment and severe respiratory problems,0.41391546225916
+Severe motor impairment and mild respiratory problems,0.413182825362493
+Severe motor impairment and moderate respiratory problems,0.533681605274608
+Severe motor impairment and severe respiratory problems,0.640940520158595
+Mild motor impairment and speech problems,0.0606904423052483
+Moderate motor impairment and speech problems,0.108701888263253
+Severe motor impairment and speech problems,0.431905118448126
+Mild respiratory and speech problems,0.0693776399349925
+Moderate respiratory and speech problems,0.264515812892439
+Severe respiratory and speech problems,0.437833754046273
+"Headache, medication overuse",0.222925730899999
+"Headache, migraine",0.440546864
+"Headache, tension-type",0.0372188569
+"Schizophrenia, acute state",0.7779924079
+"Schizophrenia, residual state",0.5881977008
+"Major depressive disorder, mild episode",0.1454356196
+"Major depressive disorder, moderate episode",0.3961870202
+"Major depressive disorder, severe episode",0.6583288358
+"Bipolar disorder, manic episode ",0.492358850599999
+"Bipolar disorder, residual state ",0.0319552272
+"Anxiety disorders, mild",0.0296041460999999
+"Anxiety disorders, moderate",0.133407369
+"Anxiety disorders, severe",0.523305401499999
+Anorexia nervosa,0.224482824
+Bulimia nervosa ,0.2231469959
+Autism spectrum disorder without intellectual disability,0.169359797978
+Autism spectrum disorder with borderline intellectual disability,0.178328590342
+Autism spectrum disorder with mild intellectual disability,0.204718946503
+Autism spectrum disorder with moderate intellectual disability,0.252480563633
+Autism spectrum disorder with severe intellectual disability,0.302363626574
+Autism spectrum disorder with profound intellectual disability,0.335791504226999
+Conduct disorder,0.241025042899999
+"Intellectual disability / mental retardation, moderate",0.100020868199999
+"Intellectual disability / mental retardation, severe",0.1600574337
+"Intellectual disability / mental retardation, profound",0.2003070717
+"Alcohol use disorder, mild",0.235253593899999
+"Alcohol use disorder, moderate",0.373244756299999
+"Alcohol use disorder, severe",0.5695974386
+"Alcohol use disorder, very mild",0.1227645383
+"Fetal alcohol syndrome, mild",0.0164155471
+"Fetal alcohol syndrome, moderate",0.0558721418
+"Fetal alcohol syndrome, severe",0.1794882318
+Heroin and other opioid dependence,0.6966036407
+"Heroin and other opioid dependence, mild",0.335195931
+"Cocaine dependence, mild",0.115560333699999
+Cocaine dependence,0.4785786378
+Cocaine dependence and Generic uncomplicated disease: worry and daily medication,0.50389347888267
+"Cocaine dependence and Heart failure, mild",0.500033260249816
+"Cocaine dependence and Heart failure, moderate",0.515376088651864
+"Cocaine dependence and Heart failure, severe",0.56971087381295
+"Amphetamine dependence, mild",0.0790949061
+Amphetamine dependence,0.485913812199999
+Amphetamine dependence and Generic uncomplicated disease: worry and daily medication,0.510876253742898
+"Amphetamine dependence and Heart failure, mild",0.507071508427613
+"Amphetamine dependence and Heart failure, moderate",0.522196575458907
+"Amphetamine dependence and Heart failure, severe",0.57570968299748
+"Cannabis dependence, mild",0.0394202694
+Cannabis dependence,0.265583123199999
+Diabetic neuropathy,0.133189991499999
+Diabetic neuropathy with diabetic foot,0.150132144781065
+Diabetic neuropathy with treated amputation,0.166810636715047
+Diabetic neuropathy with untreated amputation,0.282395873296746
+"End-stage renal disease, with kidney transplant",0.0243154636999999
+"End-stage renal disease, on dialysis",0.5708971681
+"End-stage renal disease, on dialysis and mild anemia",0.572561712792288
+"End-stage renal disease, on dialysis and moderate anemia",0.592771972201399
+"End-stage renal disease, on dialysis and severe anemia",0.632939048670002
+Chronic kidney disease (stage IV),0.1044765406
+Mild anemia with Stage IV CKD,0.107776962488985
+Moderate anemia with Stage IV CKD,0.150456456639806
+Severe anemia with Stage IV CKD,0.237206716932445
+"Mild anemia and terminal phase, without medication (for cancers, end-stage kidney/liver disease)",0.57017541467041
+"Moderate anemia and terminal phase, without medication (for cancers, end-stage kidney/liver disease)",0.590500852213088
+"Severe anemia and terminal phase, without medication (for cancers, end-stage kidney/liver disease)",0.630883907680443
+"Generic uncomplicated disease: worry and daily medication, Chronic kidney disease (stage IV)",0.148200195082815
+"Heart failure, mild; Chronic kidney disease (stage IV)",0.141455247522356
+"Heart failure, moderate; Chronic kidney disease (stage IV)",0.168395653018899
+"Heart failure, severe; Chronic kidney disease (stage IV)",0.264257554021589
+Presbyopia,0.0106037545999999
+Vertigo,0.113372240199999
+"Musculoskeletal problems, upper limbs, moderate",0.117074297999999
+"Musculoskeletal problems, generalized, moderate",0.3174463316
+"Musculoskeletal problems, generalized, severe",0.581183642100001
+"Musculoskeletal problems, lower limbs, mild",0.0226500505
+"Musculoskeletal problems, lower limbs, severe",0.164979408399999
+"Back pain, severe, with leg pain",0.324989600999999
+"Back pain, most severe, with leg pain",0.384117337899999
+Mild low back pain with leg pain,0.0199629982999999
+Moderate low back pain with leg pain,0.0539885172999999
+"Back pain, severe, without leg pain",0.272193404299999
+"Back pain, most severe, without leg pain",0.3721727228
+"Low back pain, mild",0.0199629982999999
+"Low back pain, moderate",0.0539885172999999
+"Neck pain, mild",0.0527500209
+"Neck pain, severe",0.2294386865
+"Neck pain, moderate",0.1139587682
+"Neck pain, most severe",0.3036010912
+"Gout, acute",0.2948095082
+"Musculoskeletal problems, upper limbs, mild",0.0283410989
+Severe motor impairment with incontinence,0.483395271136366
+Severe motor impairment with mild intellectual disability and incontinence,0.505106782544995
+Severe motor impairment with moderate intellectual disability and incontinence,0.534021510217163
+Severe motor impairment with severe intellectual disability and incontinence,0.564129085100834
+Severe motor impairment with mild intellectual disability,0.426872345306327
+Severe motor impairment with moderate intellectual disability,0.460540676518126
+Severe motor impairment with severe intellectual disability,0.495598284938366
+Borderline intellectual functioning and urinary incontinence,0.148399028525084
+Mild intellectual disability and urinary incontinence,0.175589861623747
+Moderate intellectual disability and urinary incontinence,0.224807919511377
+Severe intellectual disability and urinary incontinence,0.276212839095319
+Profound intellectual disability and urinary incontinence,0.310714142101135
+Mild motor impairment and borderline intellectual functioning,0.0208095883810677
+Moderate motor impairment and borderline intellectual functioning,0.070936592370279
+Severe motor impairment and borderline intellectual functioning,0.408121416700004
+Moderate motor impairment and mild intellectual functioning,0.100679216548761
+Mild motor impairment and moderate intellectual functioning,0.109115521479688
+Mild motor impairment and severe intellectual functioning,0.168549993409872
+Moderate motor impairment and severe intellectual functioning,0.210863038946613
+"Mild motor impairment, borderline intellectual functioning, and urinary incontinence",0.156995131252842
+"Moderate motor impairment, borderline intellectual functioning, and urinary incontinence",0.199919441371935
+"Severe motor impairment, borderline intellectual functioning, and urinary incontinence",0.48899922133593
+"Mild motor impairment, mild intellectual functioning, and urinary incontinence",0.183898578780819
+"Moderate motor impairment, mild intellectual functioning, and urinary incontinence",0.271558960459278
+"Mild motor impairment, moderate intellectual functioning, and urinary incontinence",0.232617018813403
+"Moderate motor impairment, moderate intellectual functioning, and urinary incontinence",0.271558960459278
+"Mild motor impairment, servere intellectual functioning, and urinary incontinence",0.283508059172119
+"Moderate motor impairment, servere intellectual functioning, and urinary incontinence",0.319777488161469
+Mild motor impairment and urinary incontinence,0.147837782535922
+Moderate motor impairment and urinary incontinence,0.191245430510548
+"Mild motor impairment, profound intellectual functioning, and urinary incontinence",0.317671503721082
+Severe motor impairment with profound intellectual disability and incontinence,0.584380092781355
+Severe motor impairment with profound intellectual disability,0.519155287068335
+Mild motor impairment with profound intellectual disability,0.208404214897135
+Moderate motor impairment with profound intellectual disability,0.248632837180573
+Moderate motor impairment with profound intellectual disability and incontinence,0.35216353678433
+Congenital heart disease,0.060814388803672
+Congenital heart disease and mild heart failure,0.0997391183602564
+Congenital heart disease and moderate heart failure,0.128104178978895
+Congenital heart disease and severe heart failure,0.22897576486061
+"Congenital heart disease, borderline intellectual functioning, and mild heart failure",0.109426792893646
+"Congenital heart disease, borderline intellectual functioning, and moderate heart failure",0.137481972912012
+"Congenital heart disease,borderline intellectual functioning, and severe heart failure",0.23727952763371
+"Congenital heart disease, mild intellectual disability, and mild heart failure",0.137954598462197
+"Congenital heart disease, mild intellectual disability, and moderate heart failure",0.165079342177595
+"Congenital heart disease, mild intellectual disability, and servere heart failure",0.261598140665577
+"Congenital heart disease, moderate intellectual disability, and mild heart failure",0.189643005466326
+"Congenital heart disease, moderate intellectual disability, and moderate heart failure",0.215076306628736
+"Congenital heart disease, moderate intellectual disability, and severe heart failure",0.305573570737976
+"Congenital heart disease, severe intellectual disability, and mild heart failure",0.243661064125913
+"Congenital heart disease, severe intellectual disability, and moderate heart failure",0.267322106085075
+"Congenital heart disease, severe intellectual disability, and severe heart failure",0.351497589198012
+"Congenital heart disease, profound intellectual disability, and mild heart failure",0.279889101456005
+"Congenital heart disease, profound intellectual disability, and moderate heart failure",0.302370799635266
+"Congenital heart disease, profound intellectual disability, and severe heart failure",0.382326986430351
+Congenital heart disease and borderline intellectual functioning,0.0709501137342094
+"Congenital heart disease and Intellectual disability / mental retardation, mild",0.100761875305934
+"Congenital heart disease and Intellectual disability / mental retardation, moderate",0.154737855584506
+"Congenital heart disease and Intellectual disability / mental retardation, severe",0.211129843640491
+"Congenital heart disease and Intellectual disability / mental retardation, profound",0.248928374202847
+Congenital heart disease and generic uncomplicated disease: worry and daily medication,0.10683962207452
+Congenital heart disease and borderline intellectual functioning and generic uncomplicated disease: worry and daily medication,0.116448447432206
+"Congenital heart disease and Intellectual disability / mental retardation, mild and generic uncomplicated disease: worry and daily medication",0.144742896124011
+"Congenital heart disease and Intellectual disability / mental retardation, moderate and generic uncomplicated disease: worry and daily medication",0.196010168827008
+"Congenital heart disease and Intellectual disability / mental retardation, severe and generic uncomplicated disease: worry and daily medication",0.24958788798433
+"Congenital heart disease and Intellectual disability / mental retardation, profound and generic uncomplicated disease: worry and daily medication",0.285521051528702
+Speech problems with disfigurement level 2,0.114538324714888
+Borderline intellectual disability with congenital heart disease,0.0709501137342094
+Mild intellectual disability with congenital heart disease,0.100761875305934
+Moderate intellectual disability with congenital heart disease,0.154737855584506
+Severe intellectual disability with congenital heart disease,0.211129843640491
+Profound intellectual disability with congenital heart disease,0.248928374202847
+Congenital heart disease and mild dementia,0.125743864647378
+Congenital heart disease and moderate dementia,0.414765683030466
+Congenital heart disease and severe dementia,0.482088516007511
+"Congenital heart disease, mild dementia, borderline intellectual disability",0.135146691111575
+"Congenital heart disease, mild dementia, mild intellectual disability",0.162822058026476
+"Congenital heart disease, mild dementia, moderate intellectual disability",0.212960856440891
+"Congenital heart disease, mild dementia, severe intellectual disability",0.265356968878748
+"Congenital heart disease, mild dementia, profound intellectual disability",0.300506469372713
+"Congenital heart disease, moderate dementia, borderline intellectual disability",0.421123853250759
+"Congenital heart disease, moderate dementia, mild intellectual disability",0.439472302016621
+"Congenital heart disease, moderate dementia, moderate intellectual disability",0.47245210538571
+"Congenital heart disease, moderate dementia, severe intellectual disability",0.506818973004937
+"Congenital heart disease, moderate dementia, profound intellectual disability",0.529882034202311
+"Congenital heart disease, severe dementia, borderline intellectual disability",0.48774426430348
+"Congenital heart disease, severe dementia, mild intellectual disability",0.503948790706145
+"Congenital heart disease, severe dementia, moderate intellectual disability",0.532989642527543
+"Congenital heart disease, severe dementia, severe intellectual disability",0.563218220702683
+"Congenital heart disease, severe dementia, profound intellectual disability",0.583504261120544
+"Mild dementia, borderline intellectual disability",0.0791533764215353
+"Mild dementia, mild intellectual disability",0.108625642147579
+"Mild dementia, moderate intellectual disability",0.162019208453151
+"Mild dementia, severe intellectual disability",0.217801397870444
+"Mild dementia, profound intellectual disability",0.25522993143955
+"Moderate dementia, borderline intellectual disability",0.383664456715302
+"Moderate dementia, mild intellectual disability",0.4032038322756
+"Moderate dementia, moderate intellectual disability",0.438323508054024
+"Moderate dementia, severe intellectual disability",0.474911265882218
+"Moderate dementia, profound intellectual disability",0.499470545522199
+"Severe dementia, borderline intellectual disability",0.454595864382451
+"Severe dementia, mild intellectual disability",0.471852172760589
+"Severe dementia, moderate intellectual disability",0.502777442306875
+"Severe dementia, severe intellectual disability",0.534960347003776
+"Severe dementia, profound intellectual disability",0.556562297781393
+Congenital heart disease with primary infertility,0.0679172983377337
+Mild intellectual disability with primary infertility,0.0497600531082001
+Borderline intellectual disability with primary infertility,0.0182634356713182
+Severe motor plus cognitive impairments and congenital heart disease,0.569527619432914
+Level 2 disfigurement with mild motor impairment,0.076420403449358
+Level 2 disfigurement with moderate motor impairment,0.123598255535468
+Level 2 disfigurement with itch/pain and mild motor impairment,0.196306458357612
+Level 2 disfigurement with itch/pain and moderate motor impairment,0.237168555370821
+Disfigurement level 1 and primary infertility,0.0184849014153449
+Mild abdominal pain and primary infertility,0.018477910314486
+"Mild abdominopelvic problem,  primary infertility, impotence, and level 1 disfigurement",0.0460397539022569
+"Mild abdominopelvic problem,  primary infertility, and impotence",0.0354606599248787
+Mild abdominopelvic problem and impotence,0.0281367332508919
+"Mild abdominopelvic problem, level 1 disfigurement and primary infertility",0.0292633456669004
+Level 1 disfigurement and impotence,0.0281438334738104
+"Mild abdominopelvic problem, level 1 disfigurement and impotence",0.0388078083466633
+Primary infertility and impotence,0.0247561336747143
+Mild abdominopelvic problem and level 1 disfigurement,0.0218887041123347
+Level 1 disfigurement and urinary incontinence,0.148591155457033
+urinary incontinence and impotence,0.154005382694268
+"Mild abdominopelvic problem, urinary incontinence, and level 1 disfigurement",0.15792260134147
+"Mild abdominopelvic problem, urinary incontinence, and impotence",0.163273136555387
+"Mild abdominopelvic problem, urinary incontinence, impotence, and level 1 disfigurement",0.17243355709298
+Level 1 disfigurement with itch/pain and mild abdominopelvic problem,0.0372098484801696
+Mild abdominopelvic problem and mild COPD and other chronic respiratory problems,0.0300917884439292
+Mild abdominopelvic problem and mild intellectual disability,0.053050500765363
+Level 1 disfigurement with itch/pain and mild COPD and other chronic respiratory problems,0.0452857361547667
+Level 1 disfigurement with itch/pain and mild intellectual disability,0.0678702019318754
+Mild intellectual disability and mild COPD and other chronic respiratory problem,0.0609883295803818
+"Mild abdominopelvic problem,  mild COPD and other chronic respiratory problems, and level 1 disfigurement with itch/pain ",0.0557511527242856
+"Mild abdominopelvic problem, mild intellectual disability, and level 1 disfigurement with itch/pain",0.0780783777391307
+"Mild COPD and other chronic respiratory problems, mild intellectual disability, and level 1 disfigurement with itch/pain",0.0857954761606223
+"Mild abdominopelvic problem, mild COPD and other chronic respiratory problems, mild intellectual disability, and level 1 disfigurement with itch/pain",0.0957876253106604
+"Mild abdominopelvic problem, moderate abdominopelvic problem, and mild COPD and other chronic respiratory problems",0.140897072060752
+Mild abdominopelvic problem and moderate abdominopelvic problem,0.124057408275088
+Moderate abdominopelvic problem and level 1 disfigurement,0.124064295017261
+"Mild abdominopelvic problem, moderate abdominopelvic problem, and level 1 disfigurement",0.205959996084546
+"Benign prostatic hypertrophy, symptomatic cases",0.0672618071
+Disfigurement level 1 and secondary infertility,0.0160953900067727
+Moderate abdominal pain and primary infertility,0.121018737524062
+Severe abdominal pain and primary infertility,0.329393755729513
+Mild abdominal pain and secondary infertility,0.016088380548197
+Moderate abdominal pain and secondary infertility,0.118883899427014
+Severe abdominal pain and secondary infertility,0.327759074651553
+Stress incontinence,0.0199451498999999
+Mild abdominal pain and stress incontinence,0.030712943228095
+Mild abdominal pain and mild depression,0.154815576626725
+"Generic uncomplicated disease: anxiety about diagnosis; Heart failure, severe",0.324319363227806
+Generic uncomplicated disease anxiety; long-term consequences due to stroke,0.324867819328663
+Generic uncomplicated disease anxiety and severe abdominopelvic problem,0.332677572205161
+Generic uncomplicated disease anxiety; long-term consequences due to stroke; severe abdominopelvic problem,0.540637979058877
+"Dental caries, symptomatic",0.0101597553
+Periodontitis,0.00679631659999999
+Severe tooth loss,0.0674457151999999
+Hypothyroidism,0.0186086072999999
+Hyperthyroidism,0.1450163846
+Thrombocytopenic purpura,0.1585135373
+"Stroke, long-term consequences, moderate; Dementia, mild; Heart failure, mild",0.169864135751384
+"Stroke, long-term consequences, moderate; Dementia, mild; Heart failure, moderate",0.195887982405175
+"Stroke, long-term consequences, moderate; Dementia, mild; Heart failure, severe",0.288561372871952
+"Stroke, long-term consequences, mild; Dementia, mild",0.134181571042197
+"Stroke, long-term consequences, severe; Dementia, mild; Generic uncomplicated disease: worry and daily medication",0.60269523858574
+"Stroke, long-term consequences, severe; Dementia, mild; Heart failure, mild",0.599626492028927
+"Stroke, long-term consequences, severe; Dementia, mild; Heart failure, moderate",0.611810500408755
+"Stroke, long-term consequences, severe; Dementia, mild; Heart failure, severe",0.654921893403531
+"Stroke, long-term consequences, moderate; Dementia, mild; Generic uncomplicated disease: worry and daily medication",0.176375812278652
+"Stroke, long-term consequences, moderate; Dementia, moderate; Generic uncomplicated disease: worry and daily medication",0.448128365022547
+"Stroke, long-term consequences, moderate; Dementia, moderate; Heart failure, mild",0.443823943401359
+"Stroke, long-term consequences, moderate; Dementia, moderate; Heart failure, moderate",0.460962380106009
+"Stroke, long-term consequences, moderate; Dementia, moderate; Heart failure, severe",0.52182174373328
+"Stroke, long-term consequences, mild; Dementia, moderate",0.42002428310105
+"Stroke, long-term consequences, severe; Dementia, moderate; Generic uncomplicated disease: worry and daily medication",0.729246184302578
+"Stroke, long-term consequences, severe; Dementia, moderate; Heart failure, mild",0.727182113017402
+"Stroke, long-term consequences, severe; Dementia, moderate; Heart failure, moderate",0.735349435498134
+"Stroke, long-term consequences, severe; Dementia, moderate; Heart failure, severe",0.764161682393678
+"Stroke, long-term consequences, moderate; Dementia, severe; Generic uncomplicated disease: worry and daily medication",0.511527238955912
+"Stroke, long-term consequences, moderate; Dementia, severe; Heart failure, mild",0.50772973658846
+"Stroke, long-term consequences, moderate; Dementia, severe; Heart failure, moderate",0.522832534382816
+"Stroke, long-term consequences, moderate; Dementia, severe; Heart failure, severe",0.57637141722338
+"Stroke, long-term consequences, mild; Dementia, severe",0.486667465160859
+"Stroke, long-term consequences, severe; Dementia, severe; Generic uncomplicated disease: worry and daily medication",0.759066357083376
+"Stroke, long-term consequences, severe; Dementia, severe; Heart failure, mild",0.757235318404353
+"Stroke, long-term consequences, severe; Dementia, severe; Heart failure, moderate",0.764472469870301
+"Stroke, long-term consequences, severe; Dementia, severe; Heart failure, severe",0.789959120912538
+"Infectious disease, post-acute consequences (fatigue, emotional lability, insomnia) and Dementia, mild",0.27245404859638
+"Infectious disease, post-acute consequences (fatigue, emotional lability, insomnia) and Dementia, moderate",0.510711580257988
+"Infectious disease, post-acute consequences (fatigue, emotional lability, insomnia) and COPD and other chronic respiratory problems, mild",0.233890841246122
+"Infectious disease, post-acute consequences (fatigue, emotional lability, insomnia) and COPD and other chronic respiratory problems, moderate",0.393121904011385
+"Infectious disease, post-acute consequences (fatigue, emotional lability, insomnia) and COPD and other chronic respiratory problems, severe",0.534750427260105
+"COPD and other chronic respiratory problems, mild and Dementia, mild",0.0870649812550049
+"COPD and other chronic respiratory problems, mild and Dementia, moderate",0.388936168408723
+"COPD and other chronic respiratory problems, moderate and Dementia, mild",0.278351157122266
+"COPD and other chronic respiratory problems, moderate and Dementia, moderate",0.514652673834047
+"COPD and other chronic respiratory problems, severe and Dementia, mild",0.448282081863597
+"COPD and other chronic respiratory problems, severe and Dementia, moderate",0.626536070464436
+"Infectious disease, post-acute consequences (fatigue, emotional lability, insomnia) and COPD and other chronic respiratory problems, mild and Dementia, mild",0.286419643845354
+"Infectious disease, post-acute consequences (fatigue, emotional lability, insomnia) and COPD and other chronic respiratory problems, mild and Dementia, moderate",0.520138966596817
+"Infectious disease, post-acute consequences (fatigue, emotional lability, insomnia) and COPD and other chronic respiratory problems, moderate and Dementia, mild",0.434468465601315
+"Infectious disease, post-acute consequences (fatigue, emotional lability, insomnia) and COPD and other chronic respiratory problems, moderate and Dementia, moderate",0.617919112678108
+"Infectious disease, post-acute consequences (fatigue, emotional lability, insomnia) and COPD and other chronic respiratory problems, severe and Dementia, mild",0.566282769835118
+"Infectious disease, post-acute consequences (fatigue, emotional lability, insomnia) and COPD and other chronic respiratory problems, severe and Dementia, moderate",0.705115872640622
+Intensive care unit admission,0.7433597016
+"Amputation of both upper limbs (long term, with treatment)",0.123
+"Amputation of both upper limbs (long term, without treatment)",0.383
+"Amputation of one upper limb (long-term, with treatment)",0.039
+"Amputation of one upper limb (long-term, without treatment)",0.118
+"Amputation of finger(s), excluding thumb (long term, with or without treatment)",0.005
+"Amputation of both lower limbs (long term, with treatment)",0.088
+"Amputation of both lower limbs (long term, without treatment)",0.443
+"Amputation of one lower limb (long term, with treatment)",0.039
+"Amputation of one lower limb (long term, without treatment)",0.173
+Amputation of thumb (long term),0.011
+"Amputation of toe (long-term, with or without treatment)",0.006
+Lower airway burns (with or without treatment),0.376
+"Burns, <20% total burned surface area or <10% total burned surface area if head/neck or hands/wrist involved (long term, with or without treatment)",0.016
+"Burns, <20% total burned surface area without lower airway burns (short term, with or without treatment)",0.141
+"Burns, ≥20% total burned surface area or ≥10% total burned surface area if head/neck or hands/wrist involved (long term, with treatment)",0.135
+"Burns, ≥20% total burned surface area or ≥10% total burned surface area if head/neck or hands/wrist involved (long term, without treatment)",0.455
+"Burns, ≥20% total burned surface area (short term, with or without treatment)",0.314
+Dislocation of hip (with or without treatment),0.016
+Dislocation of knee (with or without treatment),0.113
+Dislocation of shoulder (with or without treatment),0.062
+"Drowning and nonfatal submersion (short or long term, with or without treatment)",0.247
+"Fracture of clavicle, scapula or humerus (short or long term, with or without treatment)",0.035
+"Fracture of face bone (short or long term, with or without treatment)",0.067
+"Fracture of neck of femur (long term, with treatment)",0.058
+"Fracture of neck of femur (long term, without treatment)",0.402
+"Fracture of neck of femur (short term, with or without treatment)",0.258
+"Fracture of femur, other than femoral neck (long term, with or without treatment)",0.042
+"Fracture of femur, other than femoral neck (short term, with or without treatment)",0.111
+"Fracture of foot bones (long term, without treatment)",0.026
+"Fracture of foot bones (short term, with or without treatment)",0.026
+"Fracture of radius or ulna (long term, without treatment)",0.043
+"Fracture of radius or ulna (short term, with or without treatment)",0.028
+"Fracture of hand (long term, without treatment)",0.014
+"Fracture of hand (short term, with or without treatment)",0.01
+"Fracture of patella, tibia or fibula or ankle (long term, with or without treatment)",0.055
+"Fracture of patella, tibia or fibula or ankle (short term, with or without treatment)",0.05
+"Fracture of pelvis (long term, with or without treatment)",0.182
+"Fracture of pelvis (short term, with or without treatment)",0.279
+"Fracture of sternum and/or fracture of one or two ribs (short or long term, with or without treatment)",0.103
+"Fracture of skull (short or long term, with or without treatment)",0.071
+"Fracture of vertebral column (short or long term, with or without treatment)",0.111
+"Traumatic brain injury, long-term consequences, minor (with or without treatment)",0.094
+"Traumatic brain injury, long-term consequences, moderate (with or without treatment)",0.231
+"Traumatic brain injury, long-term consequences, severe (with or without treatment)",0.637
+"Moderate/Severe traumatic brain injury (short term, with or without treatment)",0.214
+"Severe chest injury (long term, with or without treatment)",0.047
+"Severe chest injury (short term, with or without treatment)",0.369
+Concussion,0.11
+"Crush injury (short or long term, with or without treatment)",0.132
+Injury to eyes (short term),0.054
+"Other injuries of muscle and tendon (includes sprains, strains and dislocations other than shoulder, knee, hip)",0.008
+Injured nerves (long term),0.113
+Injured nerves (short term),0.1
+Spinal cord lesion below neck level (untreated) ,0.623
+Spinal cord lesion at neck level (treated),0.589
+Spinal cord lesion at neck level (untreated) ,0.732
+"Open wound (short term, with or without treatment)",0.006
+Poisoning (with or without treatment),0.163

@@ -76,7 +76,8 @@ const AmbulanceFinder = () => {
     mapPoint.lng + bboxSize,
     mapPoint.lat + bboxSize,
   ].join("%2C");
-  const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${mapPoint.lat}%2C${mapPoint.lng}`;
+  // Use Google Maps embed centered near user's location for ambulance search
+  const mapUrl = `https://www.google.com/maps?q=${encodeURIComponent(`ambulance near ${mapPoint.lat},${mapPoint.lng}`)}&z=14&output=embed`;
   const mapsNavUrl = `https://www.google.com/maps/search/?api=1&query=ambulance+near+${mapPoint.lat},${mapPoint.lng}`;
 
   return (

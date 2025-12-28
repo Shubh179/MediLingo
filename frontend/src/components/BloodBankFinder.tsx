@@ -69,8 +69,9 @@ const BloodBankFinder = () => {
     mapPoint.lng + bboxSize,
     mapPoint.lat + bboxSize,
   ].join("%2C");
-  const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${mapPoint.lat}%2C${mapPoint.lng}`;
-  const mapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=blood+bank+nearby`;
+  // Use Google Maps embed centered near user's location for blood bank search
+  const mapUrl = `https://www.google.com/maps?q=${encodeURIComponent(`blood bank near ${mapPoint.lat},${mapPoint.lng}`)}&z=14&output=embed`;
+  const mapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`blood bank near ${mapPoint.lat},${mapPoint.lng}`)}`;
 
   const handleCall = (number: string) => {
     window.location.href = `tel:${number}`;

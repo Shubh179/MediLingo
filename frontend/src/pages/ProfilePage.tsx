@@ -29,6 +29,10 @@ const ProfilePage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [changePasswordMode, setChangePasswordMode] = useState(false);
 
+  // Sharing Code state (female users only)
+  const [sharingCode, setSharingCode] = useState<string | null>(null);
+  const [showSharingCode, setShowSharingCode] = useState(false);
+
   const [profile, setProfile] = useState<UserProfile>({
     name: "",
     email: "",
@@ -47,21 +51,54 @@ const ProfilePage = () => {
     confirmPassword: "",
   });
 
-  // Fetch user profile
+  // Fetch latest profile from backend (MongoDB) and sync UI
   useEffect(() => {
-    if (isAuthenticated && user) {
-      setProfile({
-        name: user.name || "",
-        email: user.email || "",
-        age: user.age ? String(user.age) : "",
-      });
-      setEditedProfile({
-        name: user.name || "",
-        email: user.email || "",
-        age: user.age ? String(user.age) : "",
-      });
-    }
-  }, [isAuthenticated, user]);
+    const refreshProfile = async () => {
+      if (!isAuthenticated) return;
+      try {
+        setIsLoadingProfile(true);
+        const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || "http://localhost:5001";
+        const resp = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!resp.ok) throw new Error("Failed to fetch profile");
+        const data = await resp.json();
+        const u = data?.user || user;
+        setProfile({
+          name: u?.name || "",
+          email: u?.email || "",
+          age: u?.age ? String(u.age) : "",
+        });
+        setEditedProfile({
+          name: u?.name || "",
+          email: u?.email || "",
+          age: u?.age ? String(u.age) : "",
+        });
+        // Load sharing code only for female users (separate endpoint does not expose by default)
+        if (user?.gender === 'Female') {
+          try {
+            const codeResp = await fetch(`${API_BASE_URL}/api/share/code`, {
+              method: 'GET',
+              credentials: 'include',
+            });
+            if (codeResp.ok) {
+              const codeData = await codeResp.json();
+              setSharingCode(codeData?.sharingCode || null);
+            }
+          } catch (e) {
+            // Ignore errors fetching code
+          }
+        }
+      } catch (err) {
+        console.error("Profile fetch error:", err);
+      } finally {
+        setIsLoadingProfile(false);
+      }
+    };
+
+    refreshProfile();
+  }, [isAuthenticated]);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -94,7 +131,7 @@ const ProfilePage = () => {
 
     setIsSaving(true);
     try {
-      const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || "";
+      const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || "http://localhost:5001";
       const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
         method: "PUT",
         headers: {
@@ -111,7 +148,13 @@ const ProfilePage = () => {
         throw new Error("Failed to update profile");
       }
 
-      setProfile(editedProfile);
+      const data = await response.json();
+      const u = data?.user || editedProfile;
+      setProfile({
+        name: u?.name || editedProfile.name,
+        email: u?.email || profile.email,
+        age: u?.age ? String(u.age) : editedProfile.age,
+      });
       setIsEditing(false);
       toast({
         title: "Success",
@@ -159,7 +202,7 @@ const ProfilePage = () => {
 
     setIsSaving(true);
     try {
-      const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || "";
+      const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || "http://localhost:5001";
       const response = await fetch(`${API_BASE_URL}/api/auth/change-password`, {
         method: "POST",
         headers: {
@@ -547,6 +590,58 @@ const ProfilePage = () => {
                 )}
               </CardContent>
             </Card>
+
+            {/* Sharing Code Section - Visible only for Female users */}
+            {user?.gender === 'Female' && (
+              <Card className="border-0 shadow-lg rounded-xl overflow-hidden mt-4">
+                <div className="bg-gradient-to-r from-rose-50 to-pink-50 border-b border-rose-100 px-5 py-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-rose-100 flex items-center justify-center">
+                        <span className="text-rose-600 text-xs font-bold">SC</span>
+                      </div>
+                      <h2 className="text-base font-bold text-gray-900">Menstrual Sharing Code</h2>
+                    </div>
+                  </div>
+                </div>
+                <CardContent className="pt-4 pb-3 space-y-3">
+                  <p className="text-xs text-muted-foreground">
+                    Only share this code with someone you trust. It grants full access to your period tracker data.
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1">
+                      <Label className="text-xs font-semibold text-gray-700">Your Sharing Code</Label>
+                      <div className="mt-1 flex items-center gap-2">
+                        <div className="px-3 py-2 rounded-lg border-2 border-rose-200 bg-white text-sm font-mono tracking-widest">
+                          {showSharingCode ? (sharingCode || '--------') : '********'}
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setShowSharingCode(!showSharingCode)}
+                          className="h-9 text-xs"
+                        >
+                          {showSharingCode ? 'Hide Code' : 'Show Code'}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="h-9 text-xs"
+                          onClick={() => {
+                            if (sharingCode) {
+                              navigator.clipboard.writeText(sharingCode);
+                              toast({ title: 'Copied', description: 'Sharing code copied to clipboard' });
+                            }
+                          }}
+                        >
+                          Copy
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
             </div>
           </div>
         </div>

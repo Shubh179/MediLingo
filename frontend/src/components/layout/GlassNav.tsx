@@ -12,9 +12,17 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useState } from "react";
 import { usePlan } from "@/contexts/PlanContext";
 import LanguageSwitcher from "./LanguageSwitcher";
+import ProfileDialog from "@/components/ProfileDialog";
 
 const GlassNav = () => {
   const { t } = useLanguage();
@@ -26,6 +34,7 @@ const GlassNav = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [age, setAge] = useState("");
+  const [gender, setGender] = useState<'Male' | 'Female' | ''>("");
   const [isOpen, setIsOpen] = useState(false);
   const [isSignupMode, setIsSignupMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +47,7 @@ const GlassNav = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,10 +87,15 @@ const GlassNav = () => {
       return;
     }
 
+    if (!gender) {
+      alert("Please select your gender");
+      return;
+    }
+
     setIsLoading(true);
     try {
       const fullName = `${firstName} ${lastName}`;
-      await signup(email, password, parseInt(age), fullName);
+      await signup(email, password, parseInt(age), fullName, gender);
       setIsOpen(false);
       resetForm();
     } catch (error) {
@@ -96,6 +111,8 @@ const GlassNav = () => {
     setConfirmPassword("");
     setFirstName("");
     setLastName("");
+    setAge("");
+    setGender("");
     setIsSignupMode(false);
   };
 
@@ -287,7 +304,7 @@ const GlassNav = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => window.location.href = '/profile'}
+                onClick={() => setIsProfileOpen(true)}
                 className="gap-2"
               >
                 <User className="w-4 h-4" />
@@ -356,6 +373,22 @@ const GlassNav = () => {
                           required
                           disabled={isLoading}
                         />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="gender">Gender</Label>
+                        <Select
+                          value={gender}
+                          onValueChange={(value) => setGender(value as 'Male' | 'Female')}
+                          disabled={isLoading}
+                        >
+                          <SelectTrigger className="w-full text-muted-foreground data-[placeholder]:text-muted-foreground">
+                            <SelectValue placeholder="Select gender" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Male">Male</SelectItem>
+                            <SelectItem value="Female">Female</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="email">Email</Label>
@@ -668,6 +701,9 @@ const GlassNav = () => {
           </Dialog>
         </div>
       </div>
+
+      {/* Profile Dialog */}
+      <ProfileDialog open={isProfileOpen} onOpenChange={setIsProfileOpen} />
     </header>
   );
 };
