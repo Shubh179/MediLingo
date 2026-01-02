@@ -10,15 +10,24 @@ function getAuthUserId(req: Request): string | null {
 export const getMyCycle = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = getAuthUserId(req);
-    if (!userId) { res.status(401).json({ success: false, message: 'Not authenticated' }); return; }
+    if (!userId) { 
+      console.log('❌ Not authenticated in getMyCycle');
+      res.status(401).json({ success: false, message: 'Not authenticated' }); 
+      return; 
+    }
 
     const user = await User.findById(userId);
-    if (!user) { res.status(404).json({ success: false, message: 'User not found' }); return; }
+    if (!user) { 
+      console.warn(`❌ User ${userId} not found`);
+      res.status(404).json({ success: false, message: 'User not found' }); 
+      return; 
+    }
 
     const cycle = await MenstrualCycle.findOne({ user: userId });
+    console.log(`✅ Fetched cycle for user ${userId}:`, cycle ? 'found' : 'not found');
     res.status(200).json({ success: true, cycle });
   } catch (e: any) {
-    console.error('getMyCycle error', e);
+    console.error('❌ getMyCycle error', e);
     res.status(500).json({ success: false, message: 'Error fetching cycle', error: e.message });
   }
 };
@@ -26,28 +35,45 @@ export const getMyCycle = async (req: Request, res: Response): Promise<void> => 
 export const updateMyCycle = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = getAuthUserId(req);
-    if (!userId) { res.status(401).json({ success: false, message: 'Not authenticated' }); return; }
+    if (!userId) { 
+      console.log('❌ Not authenticated in updateMyCycle');
+      res.status(401).json({ success: false, message: 'Not authenticated' }); 
+      return; 
+    }
 
     const user = await User.findById(userId);
-    if (!user) { res.status(404).json({ success: false, message: 'User not found' }); return; }
+    if (!user) { 
+      console.warn(`❌ User ${userId} not found`);
+      res.status(404).json({ success: false, message: 'User not found' }); 
+      return; 
+    }
 
     // Only female users can edit their cycle
     if (user.gender !== 'Female') {
+      console.log(`⚠️ User ${userId} is not female, cannot update cycle`);
       res.status(403).json({ success: false, message: 'Only female users can update cycle data' });
       return;
     }
 
     const { periodDuration, cycleLength, lastPeriodStart } = req.body as { periodDuration?: number; cycleLength?: number; lastPeriodStart?: string | Date | null };
 
+    console.log(`💾 Updating cycle for female user ${userId}:`, { periodDuration, cycleLength, lastPeriodStart });
+
     const upd: any = {};
     if (periodDuration !== undefined) {
       const v = Number(periodDuration);
-      if (isNaN(v) || v < 1 || v > 15) { res.status(400).json({ success: false, message: 'periodDuration must be 1-15' }); return; }
+      if (isNaN(v) || v < 1 || v > 15) { 
+        res.status(400).json({ success: false, message: 'periodDuration must be 1-15' }); 
+        return; 
+      }
       upd['settings.periodDuration'] = v;
     }
     if (cycleLength !== undefined) {
       const v = Number(cycleLength);
-      if (isNaN(v) || v < 18 || v > 45) { res.status(400).json({ success: false, message: 'cycleLength must be 18-45' }); return; }
+      if (isNaN(v) || v < 18 || v > 45) { 
+        res.status(400).json({ success: false, message: 'cycleLength must be 18-45' }); 
+        return; 
+      }
       upd['settings.cycleLength'] = v;
     }
     if (lastPeriodStart !== undefined) {
@@ -60,9 +86,10 @@ export const updateMyCycle = async (req: Request, res: Response): Promise<void> 
       { new: true, upsert: true }
     );
 
+    console.log(`✅ Cycle data saved for female user ${userId}:`, cycle);
     res.status(200).json({ success: true, cycle });
   } catch (e: any) {
-    console.error('updateMyCycle error', e);
+    console.error(`❌ updateMyCycle error for user:`, e);
     res.status(500).json({ success: false, message: 'Error updating cycle', error: e.message });
   }
 };
@@ -97,26 +124,42 @@ export const addSymptomLog = async (req: Request, res: Response): Promise<void> 
 export const getSharedCycle = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = getAuthUserId(req);
-    if (!userId) { res.status(401).json({ success: false, message: 'Not authenticated' }); return; }
+    if (!userId) { 
+      console.log('❌ Not authenticated in getSharedCycle');
+      res.status(401).json({ success: false, message: 'Not authenticated' }); 
+      return; 
+    }
 
     const targetId = String(req.params.userId);
+    console.log(`📋 Fetching shared cycle for user ${targetId} from ${userId}`);
+    
     const currentUser = await User.findById(userId);
-    if (!currentUser) { res.status(404).json({ success: false, message: 'User not found' }); return; }
+    if (!currentUser) { 
+      console.warn(`❌ User ${userId} not found`);
+      res.status(404).json({ success: false, message: 'User not found' }); 
+      return; 
+    }
 
     // Must have explicit access
     const allowed = (currentUser.sharedAccessList || []).some(id => String(id) === targetId);
-    if (!allowed) { res.status(403).json({ success: false, message: 'No access to this profile' }); return; }
+    if (!allowed) { 
+      console.warn(`❌ User ${userId} has no access to ${targetId}`);
+      res.status(403).json({ success: false, message: 'No access to this profile' }); 
+      return; 
+    }
 
     const targetUser = await User.findById(targetId);
     if (!targetUser || targetUser.gender !== 'Female') {
+      console.warn(`❌ Target user ${targetId} not found or not female`);
       res.status(404).json({ success: false, message: 'Target profile not found' });
       return;
     }
 
     const cycle = await MenstrualCycle.findOne({ user: targetId });
+    console.log(`✅ Shared cycle data fetched:`, cycle ? 'found' : 'not found');
     res.status(200).json({ success: true, user: { id: targetUser._id, name: targetUser.name }, cycle });
   } catch (e: any) {
-    console.error('getSharedCycle error', e);
+    console.error('❌ getSharedCycle error', e);
     res.status(500).json({ success: false, message: 'Error fetching shared cycle', error: e.message });
   }
 };

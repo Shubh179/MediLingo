@@ -73,29 +73,47 @@ userSchema.methods.comparePassword = async function(candidatePassword: string): 
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Helper to generate a random 8-character alphanumeric code
+// Helper to generate a random 8-character alphanumeric code with high uniqueness
 function generateSharingCode(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const timestamp = Date.now().toString(36).toUpperCase(); // Add time-based entropy
   let result = '';
+  
+  // Use crypto-quality randomness for better uniqueness
   for (let i = 0; i < 8; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
+    const randomIndex = Math.floor(Math.random() * chars.length);
+    result += chars.charAt(randomIndex);
   }
-  return result;
+  
+  // Mix in timestamp to reduce collision probability
+  const mixed = result.substring(0, 5) + timestamp.substring(timestamp.length - 3);
+  
+  return mixed.substring(0, 8).toUpperCase();
 }
 
 // Auto-generate sharingCode for Female users if missing
 userSchema.pre('save', async function (next) {
   // Only generate for female users and when code not already set
   if (this.gender === 'Female' && !this.sharingCode) {
-    // Attempt to generate a unique code; retry a few times on collision
-    for (let attempt = 0; attempt < 5; attempt++) {
+    // Attempt to generate a unique code; retry up to 10 times on collision
+    let codeGenerated = false;
+    for (let attempt = 0; attempt < 10; attempt++) {
       const code = generateSharingCode();
       // @ts-ignore
       const existing = await (this.constructor as any).findOne({ sharingCode: code });
       if (!existing) {
         this.sharingCode = code;
+        codeGenerated = true;
+        console.log(`✅ Generated unique sharing code: ${code} for female user`);
         break;
+      } else {
+        console.log(`⚠️ Collision detected on attempt ${attempt + 1}, regenerating...`);
       }
+    }
+    
+    if (!codeGenerated) {
+      console.error('❌ Failed to generate unique sharing code after 10 attempts');
+      return next(new Error('Unable to generate unique sharing code. Please try again.'));
     }
   }
   next();

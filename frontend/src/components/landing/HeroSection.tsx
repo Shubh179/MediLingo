@@ -80,16 +80,25 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
   // Load shared profiles for male users
   useEffect(() => {
     const loadSharedProfiles = async () => {
-      if (user?.gender !== 'Male') return;
+      if (user?.gender !== 'Male') {
+        console.log('👤 Not a male user, skipping shared profiles load');
+        return;
+      }
       try {
         const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5001';
+        console.log('📋 Loading shared profiles from:', `${API_BASE_URL}/api/share/profiles`);
         const resp = await fetch(`${API_BASE_URL}/api/share/profiles`, { credentials: 'include' });
+        
         if (resp.ok) {
           const data = await resp.json();
+          console.log('✅ Shared profiles loaded:', data?.profiles);
           setSharedProfiles(data?.profiles || []);
+        } else {
+          const errorData = await resp.json();
+          console.warn('⚠️ Failed to load shared profiles:', errorData);
         }
       } catch (e) {
-        // ignore
+        console.error('❌ Error loading shared profiles:', e);
       }
     };
     loadSharedProfiles();
@@ -98,18 +107,29 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
   // Fetch shared cycle when a profile is selected
   useEffect(() => {
     const fetchSharedCycle = async () => {
-      if (!selectedSharedProfile) { setSharedData(null); return; }
+      if (!selectedSharedProfile) { 
+        setSharedData(null); 
+        return; 
+      }
       setSharedLoading(true);
       try {
         const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5001';
-        const resp = await fetch(`${API_BASE_URL}/api/cycle/shared/${selectedSharedProfile.id}`, { credentials: 'include' });
+        console.log('📅 Fetching shared cycle for:', selectedSharedProfile.id);
+        const resp = await fetch(`${API_BASE_URL}/api/cycle/shared/${selectedSharedProfile.id}`, { 
+          credentials: 'include' 
+        });
+        
         if (resp.ok) {
           const data = await resp.json();
+          console.log('✅ Shared cycle data received:', data);
           setSharedData({ user: data.user, cycle: data.cycle });
         } else {
+          const errorData = await resp.json();
+          console.warn('⚠️ Failed to fetch shared cycle:', resp.status, errorData);
           setSharedData(null);
         }
-      } catch {
+      } catch (e) {
+        console.error('❌ Error fetching shared cycle:', e);
         setSharedData(null);
       } finally {
         setSharedLoading(false);
@@ -133,10 +153,17 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
       cycleLength: Number(cycleForm.cycleLength) || settings.cycleLength,
       lastPeriodStart: cycleForm.lastPeriodStart.toISOString(),
     });
+    
     // Persist to backend so shared viewers can see data
     try {
       const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5001';
-      await fetch(`${API_BASE_URL}/api/cycle/me`, {
+      console.log('💾 Saving cycle data to backend:', {
+        periodDuration: Number(cycleForm.periodDuration),
+        cycleLength: Number(cycleForm.cycleLength),
+        lastPeriodStart: cycleForm.lastPeriodStart.toISOString(),
+      });
+      
+      const response = await fetch(`${API_BASE_URL}/api/cycle/me`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -146,11 +173,28 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
           lastPeriodStart: cycleForm.lastPeriodStart.toISOString(),
         }),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Failed to save cycle (${response.status})`);
+      }
+
+      const data = await response.json();
+      console.log('✅ Cycle data saved successfully:', data);
+      
+      setShowCycleDialog(false);
+      toast({ 
+        title: "Cycle saved", 
+        description: "Your menstrual cycle data has been saved and is now visible to shared viewers." 
+      });
     } catch (e) {
-      console.warn('Failed to persist cycle to backend', e);
+      console.error('❌ Failed to persist cycle to backend:', e);
+      toast({
+        title: "Error saving cycle",
+        description: `${e instanceof Error ? e.message : 'Unknown error occurred'}`,
+        variant: "destructive",
+      });
     }
-    setShowCycleDialog(false);
-    toast({ title: "Cycle saved", description: "Countdown refreshed and ready to sync." });
   };
 
   const handleGoogleSync = () => {
@@ -422,11 +466,44 @@ const HeroSection = ({ onScanClick, onFileSelected }: HeroSectionProps) => {
       {/* Shared Profile Viewer Dialog */}
       <Dialog open={!!selectedSharedProfile} onOpenChange={(open) => !open && setSelectedSharedProfile(null)}>
         <DialogContent className="sm:max-w-[520px]">
-          <DialogHeader>
-            <DialogTitle>Viewing Shared Profile</DialogTitle>
-            <DialogDescription>
-              Read-only cycle calendar and symptoms for {selectedSharedProfile?.name}
-            </DialogDescription>
+          <DialogHeader className="flex items-center justify-between">
+            <div>
+              <DialogTitle>Viewing Shared Profile</DialogTitle>
+              <DialogDescription>
+                Read-only cycle calendar and symptoms for {selectedSharedProfile?.name}
+              </DialogDescription>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => {
+                if (selectedSharedProfile) {
+                  setSharedLoading(true);
+                  // Re-fetch the shared cycle data
+                  const fetchUpdated = async () => {
+                    try {
+                      const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5001';
+                      const resp = await fetch(`${API_BASE_URL}/api/cycle/shared/${selectedSharedProfile.id}`, { 
+                        credentials: 'include' 
+                      });
+                      if (resp.ok) {
+                        const data = await resp.json();
+                        console.log('✅ Refreshed shared cycle data:', data);
+                        setSharedData({ user: data.user, cycle: data.cycle });
+                      }
+                    } catch (e) {
+                      console.error('❌ Error refreshing shared cycle:', e);
+                    } finally {
+                      setSharedLoading(false);
+                    }
+                  };
+                  fetchUpdated();
+                }
+              }}
+              className="text-xs"
+            >
+              🔄 Refresh
+            </Button>
           </DialogHeader>
             <div className="space-y-4">
               {sharedLoading && (

@@ -61,12 +61,21 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
       if (!isAuthenticated || !open) return;
       try {
         const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || "http://localhost:5001";
+        console.log("📱 Fetching profile from:", `${API_BASE_URL}/api/auth/profile`);
+        
         const resp = await fetch(`${API_BASE_URL}/api/auth/profile`, {
           method: "GET",
           credentials: "include",
         });
-        if (!resp.ok) throw new Error("Failed to fetch profile");
+        
+        if (!resp.ok) {
+          const errorData = await resp.json();
+          throw new Error(errorData.message || `Failed to fetch profile (${resp.status})`);
+        }
+        
         const data = await resp.json();
+        console.log("✅ Profile data received:", data);
+        
         const u = data?.user || user;
         setProfile({
           name: u?.name || "",
@@ -78,28 +87,40 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
           email: u?.email || "",
           age: u?.age ? String(u.age) : "",
         });
+        
         // Load sharing code only for female users
         if (user?.gender === 'Female') {
           try {
+            console.log("👩 Fetching sharing code for female user...");
             const codeResp = await fetch(`${API_BASE_URL}/api/share/code`, {
               method: 'GET',
               credentials: 'include',
             });
+            
             if (codeResp.ok) {
               const codeData = await codeResp.json();
+              console.log("✅ Sharing code received:", codeData);
               setSharingCode(codeData?.sharingCode || null);
+            } else {
+              const errorData = await codeResp.json();
+              console.warn("⚠️ Failed to fetch sharing code:", errorData);
             }
           } catch (e) {
-            // Ignore errors fetching code
+            console.error("❌ Error fetching sharing code:", e);
           }
         }
       } catch (err) {
-        console.error("Profile fetch error:", err);
+        console.error("❌ Profile fetch error:", err);
+        toast({
+          title: "Error",
+          description: `Failed to fetch profile: ${err instanceof Error ? err.message : 'Unknown error'}`,
+          variant: "destructive",
+        });
       }
     };
 
     refreshProfile();
-  }, [isAuthenticated, open]);
+  }, [isAuthenticated, open, user]);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -170,6 +191,39 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
       });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleRegenerateCode = async () => {
+    try {
+      const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || "http://localhost:5001";
+      console.log("🔄 Regenerating sharing code...");
+      
+      const response = await fetch(`${API_BASE_URL}/api/share/regenerate-code`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to regenerate code');
+      }
+
+      const data = await response.json();
+      console.log("✅ New sharing code generated:", data.sharingCode);
+      
+      setSharingCode(data.sharingCode);
+      toast({
+        title: "Success",
+        description: "New unique sharing code generated!",
+      });
+    } catch (error) {
+      console.error("❌ Error regenerating code:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate new code. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -605,6 +659,15 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
                       }}
                     >
                       Copy
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-8 text-xs px-3 border-rose-300 text-rose-600 hover:bg-rose-50"
+                      onClick={handleRegenerateCode}
+                    >
+                      Regenerate
                     </Button>
                   </div>
                 </div>
