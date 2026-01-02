@@ -1,0 +1,252 @@
+// DRIVER SIMULATOR - USAGE GUIDE
+// ==============================
+//
+// Location: server/public/driver-simulator.html
+// Access: http://localhost:3000/driver-simulator.html
+//
+// QUICK START:
+// 1. Make sure backend is running (npm run dev in server/)
+// 2. Open http://localhost:3000/driver-simulator.html in browser
+// 3. Enter Vehicle ID (e.g., "DRV-001")
+// 4. Click "Start Tracking"
+// 5. Allow location access when browser asks
+// 6. See coordinates sent every 5 seconds
+//
+// =====================================================
+// FEATURES
+// =====================================================
+//
+// ✓ Real GPS via navigator.geolocation API
+//   - Automatically gets your device's current position
+//   - Updates every 5 seconds (configurable)
+//   - Accuracy based on device capability
+//
+// ✓ Socket.io Emission
+//   - Sends: { driverId, location: { lat, lng, accuracy, timestamp } }
+//   - Matches backend driver:location event handler
+//   - Real-time transmission to server
+//
+// ✓ Manual Location Fallback
+//   - Enter lat/lng manually if geolocation fails
+//   - Useful for testing with specific coordinates
+//   - Same Socket.io emission
+//
+// ✓ Visual Feedback
+//   - Connection status indicator
+//   - Update counter
+//   - Last sent coordinates display
+//   - Accuracy meter
+//   - Success/error messages
+//
+// ✓ Debugging Features
+//   - Browser console logs all events
+//   - Timestamps for each update
+//   - Error messages if geolocation fails
+//   - Server URL configurable
+//
+// =====================================================
+// CONFIGURATION
+// =====================================================
+//
+// Vehicle ID: Unique identifier for this "driver"
+//   Default: DRV-TEST-001
+//   Format: Any string (e.g., "DRIVER-123", "VEH-ABC")
+//
+// Server URL: Where to send GPS data
+//   Default: http://localhost:3000
+//   Change if backend runs on different host/port
+//
+// Update Interval: How often to send location
+//   Default: 5 seconds
+//   Min: 1 second
+//   Max: 60 seconds
+//   Note: Only changeable when not tracking
+//
+// =====================================================
+// HOW IT WORKS
+// =====================================================
+//
+// Flow:
+//   [Start Button]
+//      ↓
+//   [Get Current Position via Geolocation API]
+//      ↓
+//   [Update UI with coordinates]
+//      ↓
+//   [Emit via Socket.io: driver:location]
+//      ↓
+//   [Backend receives and broadcasts to users]
+//      ↓
+//   [Wait 5 seconds]
+//      ↓
+//   [Repeat]
+//
+// Socket.io Event:
+//   socket.emit('driver:location', {
+//     driverId: 'DRV-TEST-001',
+//     location: {
+//       latitude: 28.6139,
+//       longitude: 77.2090,
+//       accuracy: 10,
+//       timestamp: 1704110400000
+//     }
+//   })
+//
+// =====================================================
+// TESTING SCENARIOS
+// =====================================================
+//
+// 1. LOCAL TESTING (with real GPS)
+//    - Run on laptop/phone with GPS
+//    - Enable location access
+//    - Watch coordinates update
+//    - Verify backend receives events
+//
+// 2. MANUAL TESTING (without GPS)
+//    - Use "Manual Coordinates" section
+//    - Enter specific lat/lng values
+//    - Click "Send Manual Location"
+//    - Test with known coordinates
+//
+// 3. MULTIPLE DRIVERS
+//    - Open simulator in multiple browser tabs
+//    - Use different Vehicle IDs (DRV-001, DRV-002, etc.)
+//    - Each sends GPS independently
+//    - Watch real-time tracking on frontend
+//
+// 4. CONNECTION TESTING
+//    - Change server URL while simulator running
+//    - Test connection/disconnection handling
+//    - Verify error messages display
+//    - Check reconnection attempts
+//
+// =====================================================
+// DEBUGGING
+// =====================================================
+//
+// Open Browser DevTools (F12) → Console to see:
+//   ✅ "Connected to server"
+//   📍 "Sent #1: (28.6139, 77.2090)"
+//   ❌ "Geolocation error: Permission denied"
+//   etc.
+//
+// Common Issues:
+//
+//   1. "Not connected to server"
+//      → Make sure backend is running
+//      → Check server URL is correct
+//      → Check http:// vs https://
+//
+//   2. "Geolocation not supported"
+//      → Only works on HTTPS or localhost
+//      → Check device location settings
+//      → Use manual coordinates instead
+//
+//   3. "Location permission denied"
+//      → Browser asked for permission, user clicked "Block"
+//      → Reset site permissions in browser settings
+//      → Try in private/incognito window
+//
+//   4. Updates not appearing on tracking page
+//      → Check vehicle ID matches what user is tracking
+//      → Verify Socket.io room setup on backend
+//      → Open tracking page in same window/different tabs
+//
+// =====================================================
+// TECHNICAL DETAILS
+// =====================================================
+//
+// Technologies:
+//   - Socket.io: Real-time bidirectional communication
+//   - Geolocation API: Device GPS location
+//   - Vanilla JavaScript: No frameworks
+//   - CSS Grid/Flexbox: Responsive layout
+//
+// Permissions Required:
+//   - Location access (browser permission)
+//   - WebSocket access (if behind firewall)
+//
+// Browsers Supported:
+//   - Chrome 50+
+//   - Firefox 45+
+//   - Safari 10+
+//   - Edge 15+
+//   - Mobile browsers (iOS Safari, Chrome Mobile)
+//
+// Geolocation Accuracy:
+//   - Desktop with GPS: ~10-30m
+//   - Desktop without GPS: Not available
+//   - Mobile with GPS: ~5-20m
+//   - Accuracy displayed in "Accuracy" stat
+//
+// =====================================================
+// INTEGRATION WITH TRACKING
+// =====================================================
+//
+// Data Flow:
+//
+//   Driver Simulator (GPS Source)
+//      ↓ Socket.io emit
+//   Backend TrackingService (Chunk 1)
+//      ↓ room broadcast
+//   useVehicleTracking Hook (Chunk 3)
+//      ↓ Socket.io listener
+//   LiveDeliveryMap Component (Chunk 3)
+//      ↓ display
+//   Browser (Smooth animated marker)
+//
+// To test end-to-end:
+//   1. Run backend: npm run dev (in server/)
+//   2. Run frontend: npm run dev (in frontend/)
+//   3. Open http://localhost:3000/driver-simulator.html
+//   4. Open http://localhost:5173/tracking/order123/driverId/userId
+//   5. Start simulator → watch frontend update in real-time!
+//
+// =====================================================
+// API REFERENCE
+// =====================================================
+//
+// Socket.io Events Emitted:
+//
+//   'driver:location'
+//     Data: {
+//       driverId: string,
+//       location: {
+//         latitude: number,
+//         longitude: number,
+//         accuracy: number,
+//         timestamp: number
+//       }
+//     }
+//
+// Socket.io Events Received:
+//
+//   'connect'        - Connected to server
+//   'disconnect'     - Lost connection to server
+//   'error'          - Connection error occurred
+//
+// =====================================================
+// EXAMPLE COORDINATES (DELHI)
+// =====================================================
+//
+// If geolocation fails, test with these Delhi coordinates:
+//
+// Apollo Hospital Delhi
+//   Latitude: 28.5355
+//   Longitude: 77.2172
+//
+// Delhi Airport
+//   Latitude: 28.5562
+//   Longitude: 77.0983
+//
+// Connaught Place
+//   Latitude: 28.6310
+//   Longitude: 77.1856
+//
+// India Gate
+//   Latitude: 28.6129
+//   Longitude: 77.2295
+//
+// Test: Enter these in manual coordinates section
+//
+// =====================================================

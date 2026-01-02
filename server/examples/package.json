@@ -1,0 +1,14 @@
+{
+  "name": "tracking-test-client",
+  "version": "1.0.0",
+  "description": "Test clients for vehicle tracking system",
+  "type": "module",
+  "scripts": {
+    "driver": "node driver-client-example.js",
+    "user": "node user-client-example.js",
+    "test": "echo 'Run: npm run driver DRIVER001 or npm run user USER001 DRIVER001'"
+  },
+  "dependencies": {
+    "socket.io-client": "^4.8.1"
+  }
+}

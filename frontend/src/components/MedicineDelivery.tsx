@@ -1,12 +1,17 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Truck, MapPin, Phone, Package, Upload, CheckCircle2, Clock } from "lucide-react";
+import { Truck, MapPin, Phone, Package, Upload, CheckCircle2, Clock, MapPinned } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const MedicineDelivery = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -16,6 +21,7 @@ const MedicineDelivery = () => {
     prescription: null as File | null
   });
   const [submitted, setSubmitted] = useState(false);
+  const [orderId, setOrderId] = useState("");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -42,11 +48,23 @@ const MedicineDelivery = () => {
       });
       return;
     }
+    
+    // Generate order ID (in real app, this would come from backend)
+    const newOrderId = `ORD-${Date.now()}`;
+    setOrderId(newOrderId);
     setSubmitted(true);
+    
     toast({
       title: "Order placed successfully",
       description: "Your medicines will be delivered within 1-2 hours",
     });
+  };
+
+  const handleTrackOrder = () => {
+    // For demo: using test driver ID. In production, backend assigns driver
+    const driverId = "DRV-TEST-001";
+    const userId = user?.email || "guest-user";
+    navigate(`/tracking/${orderId}/${driverId}/${userId}`);
   };
 
   if (submitted) {
@@ -55,6 +73,9 @@ const MedicineDelivery = () => {
         <CheckCircle2 className="w-16 h-16 text-green-600 mx-auto" />
         <div>
           <h3 className="text-xl font-semibold text-gray-900">Order Confirmed</h3>
+          <p className="text-sm text-gray-600 mt-2">
+            Order ID: <span className="font-mono font-semibold text-emerald-600">{orderId}</span>
+          </p>
           <p className="text-sm text-gray-600 mt-2">
             Your medicines will be delivered to:
           </p>
@@ -69,9 +90,20 @@ const MedicineDelivery = () => {
             We'll call you at {formData.phone} for confirmation
           </p>
         </div>
-        <Button onClick={() => setSubmitted(false)} variant="outline">
-          Place Another Order
-        </Button>
+        
+        <div className="space-y-2">
+          <Button 
+            onClick={handleTrackOrder} 
+            className="w-full bg-emerald-600 hover:bg-emerald-700 gap-2"
+          >
+            <MapPinned className="w-4 h-4" />
+            Track Order in Real-Time
+          </Button>
+          
+          <Button onClick={() => setSubmitted(false)} variant="outline" className="w-full">
+            Place Another Order
+          </Button>
+        </div>
       </div>
     );
   }

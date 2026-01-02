@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
+import { createServer } from 'http';
+import { Server as SocketIOServer } from 'socket.io';
 import connectDB from './config/db';
 import prescriptionRoutes from './routes/prescriptionRoutes';
 import voiceRoutes from './routes/voiceRoutes';
@@ -14,11 +16,27 @@ import doctorRoutes from './routes/doctorRoutes';
 import shareRoutes from './routes/shareRoutes';
 import cycleRoutes from './routes/cycleRoutes';
 import { SESSION_SECRET, NODE_ENV, FRONTEND_URL, PORT } from './config/env';
+import { TrackingService } from './services/trackingService';
 
 // Initialize configuration
 dotenv.config();
 
 const app: Application = express();
+const httpServer = createServer(app);
+
+// Initialize Socket.io with CORS
+const io = new SocketIOServer(httpServer, {
+  cors: {
+    origin: FRONTEND_URL,
+    credentials: true,
+    methods: ['GET', 'POST']
+  },
+  // Optimize for 5-second GPS updates
+  pingTimeout: 60000,
+  pingInterval: 25000,
+  // Buffering settings for burst updates
+  transports: ['websocket', 'polling'],
+});
 
 // Middleware - Cookie Parser
 app.use(cookieParser());
@@ -46,6 +64,9 @@ app.use(session({
   },
   name: 'medilingo_session', // Custom session cookie name
 }));
+
+// Serve static files (for driver simulator)
+app.use(express.static('public'));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -78,10 +99,20 @@ async function startServer() {
     // Connect to MongoDB first
     await connectDB();
 
+    // Initialize Vehicle Tracking Service
+    const trackingService = new TrackingService(io);
+    console.log('🚗 Vehicle tracking service initialized');
+
+    // Add tracking stats endpoint
+    app.get('/api/tracking/stats', (req: Request, res: Response) => {
+      res.json(trackingService.getStats());
+    });
+
     // Start server
-    const server = app.listen(PORT, '0.0.0.0', () => {
+    const server = httpServer.listen(Number(PORT), '0.0.0.0', () => {
       console.log(`🚀 Server running in ${NODE_ENV} mode on port ${PORT}`);
       console.log(`📡 API available at http://0.0.0.0:${PORT}`);
+      console.log(`🔌 WebSocket server ready for vehicle tracking`);
     });
 
     server.on('error', (error: NodeJS.ErrnoException) => {

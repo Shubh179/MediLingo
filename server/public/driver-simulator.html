@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Driver Simulator - MediLingo Tracking</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      padding: 30px;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+      font-size: 14px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: #f5f5f5;
+      color: #333;
+      border: 2px solid #e0e0e0;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #e8e8e8;
+      transform: translateY(-2px);
+    }
+
+    .status-card {
+      background: #f9f9f9;
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+
+    .status-label {
+      font-size: 12px;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+    }
+
+    .status-value {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      word-break: break-all;
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ccc;
+      margin-right: 6px;
+      animation: none;
+    }
+
+    .status-indicator.active {
+      background: #4caf50;
+      animation: pulse 1s infinite;
+    }
+
+    .status-indicator.error {
+      background: #f44336;
+      animation: none;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .info-section {
+      background: #f0f7ff;
+      border: 1px solid #b3d9ff;
+      border-radius: 6px;
+      padding: 15px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #0066cc;
+    }
+
+    .info-section strong {
+      display: block;
+      margin-bottom: 5px;
+      color: #004499;
+    }
+
+    .coordinates-display {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 15px;
+      margin-bottom: 20px;
+      font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+      font-size: 12px;
+    }
+
+    .coord-label {
+      color: #999;
+      font-size: 11px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .coord-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .coord-item:last-child {
+      border-bottom: none;
+    }
+
+    .coord-key {
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    .coord-value {
+      color: #333;
+      text-align: right;
+      word-break: break-word;
+      max-width: 60%;
+    }
+
+    .error-message {
+      background: #ffebee;
+      border-left: 4px solid #f44336;
+      color: #c62828;
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .success-message {
+      background: #e8f5e9;
+      border-left: 4px solid #4caf50;
+      color: #2e7d32;
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .stat-box {
+      background: #f5f5f5;
+      padding: 12px;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: #999;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 600;
+      color: #667eea;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #667eea;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 6px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .connection-status {
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      padding: 8px 12px;
+      border-radius: 4px;
+      background: #f5f5f5;
+      margin-bottom: 15px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚗 Driver Simulator</h1>
+    <p class="subtitle">Test real-time GPS tracking with manual location updates</p>
+
+    <!-- Connection Status -->
+    <div class="connection-status" id="connectionStatus">
+      <span class="status-indicator" id="statusIndicator"></span>
+      <span id="statusText">Disconnected</span>
+    </div>
+
+    <!-- Error/Success Messages -->
+    <div id="messageContainer"></div>
+
+    <!-- Configuration Section -->
+    <div class="form-group">
+      <label for="vehicleId">Vehicle ID</label>
+      <input
+        type="text"
+        id="vehicleId"
+        placeholder="e.g., DRV-001, DRIVER-123"
+        value="DRV-TEST-001"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="serverUrl">Server URL</label>
+      <input
+        type="text"
+        id="serverUrl"
+        placeholder="e.g., http://localhost:5001"
+        value="http://localhost:5001"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="updateInterval">Update Interval (seconds)</label>
+      <input
+        type="number"
+        id="updateInterval"
+        value="5"
+        min="1"
+        max="60"
+        disabled
+      />
+    </div>
+
+    <!-- Controls -->
+    <div class="button-group">
+      <button class="btn-primary" id="startBtn" onclick="startTracking()">
+        ▶ Start Tracking
+      </button>
+      <button class="btn-secondary" id="stopBtn" onclick="stopTracking()" disabled>
+        ⏹ Stop Tracking
+      </button>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats">
+      <div class="stat-box">
+        <div class="stat-label">Updates Sent</div>
+        <div class="stat-value" id="updateCount">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Accuracy</div>
+        <div class="stat-value" id="accuracy">--</div>
+      </div>
+    </div>
+
+    <!-- Last Sent Coordinates -->
+    <div class="coordinates-display">
+      <div class="coord-label">📍 Last Sent Coordinates</div>
+      <div class="coord-item">
+        <span class="coord-key">Latitude:</span>
+        <span class="coord-value" id="lastLat">Not sent yet</span>
+      </div>
+      <div class="coord-item">
+        <span class="coord-key">Longitude:</span>
+        <span class="coord-value" id="lastLng">Not sent yet</span>
+      </div>
+      <div class="coord-item">
+        <span class="coord-key">Timestamp:</span>
+        <span class="coord-value" id="lastTimestamp">--:--:--</span>
+      </div>
+      <div class="coord-item">
+        <span class="coord-key">Speed:</span>
+        <span class="coord-value" id="lastSpeed">N/A</span>
+      </div>
+    </div>
+
+    <!-- Info Section -->
+    <div class="info-section" id="infoSection">
+      <strong>ℹ️ How it works</strong>
+      <div>
+        • Enable location on your device<br>
+        • Backend server must be running<br>
+        • Updates sent every 5 seconds<br>
+        • Check browser console for details
+      </div>
+    </div>
+
+    <!-- Manual Location Entry (Fallback) -->
+    <div class="form-group">
+      <label>Manual Coordinates (Fallback) - Kandivali West, Mumbai</label>
+      <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+        <input type="number" id="manualLat" placeholder="Latitude" step="0.0001" value="19.1890" />
+        <input type="number" id="manualLng" placeholder="Longitude" step="0.0001" value="72.8398" />
+      </div>
+      <button class="btn-secondary" onclick="sendManualLocation()">
+        📍 Send Manual Location
+      </button>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    let socket = null;
+    let trackingInterval = null;
+    let isTracking = false;
+    let updatesSent = 0;
+
+    // Initialize
+    function init() {
+      connectSocket();
+      setupGeolocation();
+    }
+
+    // Connect to Socket.io
+    function connectSocket() {
+      const serverUrl = document.getElementById('serverUrl').value;
+      
+      socket = io(serverUrl, {
+        reconnection: true,
+        reconnectionDelay: 1000,
+        reconnectionAttempts: 5,
+      });
+
+      socket.on('connect', () => {
+        console.log('✅ Connected to server');
+        updateConnectionStatus(true);
+        showMessage('Connected to server', 'success');
+      });
+
+      socket.on('disconnect', () => {
+        console.log('❌ Disconnected from server');
+        updateConnectionStatus(false);
+        if (isTracking) {
+          showMessage('Server disconnected - tracking paused', 'error');
+        }
+      });
+
+      socket.on('error', (error) => {
+        console.error('Socket error:', error);
+        updateConnectionStatus(false);
+        showMessage(`Connection error: ${error}`, 'error');
+      });
+    }
+
+    // Geolocation Setup with High Accuracy Mode
+    function setupGeolocation() {
+      if (!navigator.geolocation) {
+        showMessage('Geolocation not supported on this device', 'error');
+        document.getElementById('startBtn').disabled = true;
+      } else {
+        showMessage('✅ High Accuracy GPS mode enabled (enableHighAccuracy: true)', 'info');
+      }
+    }
+
+    // Start Tracking
+    function startTracking() {
+      const vehicleId = document.getElementById('vehicleId').value;
+      const interval = parseInt(document.getElementById('updateInterval').value) * 1000;
+
+      if (!vehicleId.trim()) {
+        showMessage('Please enter a Vehicle ID', 'error');
+        return;
+      }
+
+      if (!socket || !socket.connected) {
+        showMessage('Not connected to server. Reconnecting...', 'error');
+        connectSocket();
+        return;
+      }
+
+      isTracking = true;
+      updatesSent = 0;
+      document.getElementById('updateCount').textContent = '0';
+      document.getElementById('startBtn').disabled = true;
+      document.getElementById('stopBtn').disabled = false;
+      document.getElementById('updateInterval').disabled = true;
+
+      showMessage(`📍 Tracking started for ${vehicleId}`, 'success');
+      console.log(`Starting to track vehicle: ${vehicleId}`);
+
+      // First, register driver connection
+      socket.emit('driver:connect', {
+        driverId: vehicleId,
+        driverName: 'Simulator Driver',
+        vehicleNumber: 'SIM-' + vehicleId,
+        phoneNumber: '+91-9999999999',
+        isActive: true,
+      });
+
+      // Initial update immediately
+      sendLocationUpdate(vehicleId);
+
+      // Then repeat every interval
+      trackingInterval = setInterval(() => {
+        if (isTracking) {
+          sendLocationUpdate(vehicleId);
+        }
+      }, interval);
+    }
+
+    // Stop Tracking
+    function stopTracking() {
+      isTracking = false;
+      clearInterval(trackingInterval);
+      trackingInterval = null;
+
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('stopBtn').disabled = true;
+      document.getElementById('updateInterval').disabled = false;
+
+      showMessage('✋ Tracking stopped', 'success');
+      console.log('Tracking stopped');
+    }
+
+    // Send Location Update with High Accuracy GPS (forces sensor fix, not IP-based)
+    function sendLocationUpdate(vehicleId) {
+      // High Accuracy Options: enableHighAccuracy=true forces GPS sensor use instead of IP-based location
+      // timeout: 15000ms - max wait time for GPS fix
+      // maximumAge: 0 - forces fresh GPS reading (no cached locations)
+      const geoOptions = {
+        enableHighAccuracy: true,  // CRITICAL: Forces GPS/sensor fix, bypasses IP-based location
+        timeout: 15000,             // Max 15 seconds to get GPS fix
+        maximumAge: 0,              // Always get fresh location (no cache)
+      };
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude, accuracy, altitudeAccuracy } = position.coords;
+          const timestamp = Date.now();
+
+          // Update UI
+          updatesSent++;
+          document.getElementById('updateCount').textContent = updatesSent;
+          document.getElementById('lastLat').textContent = latitude.toFixed(6);
+          document.getElementById('lastLng').textContent = longitude.toFixed(6);
+          document.getElementById('lastTimestamp').textContent = new Date(timestamp).toLocaleTimeString();
+          document.getElementById('accuracy').textContent = accuracy.toFixed(0) + 'm';
+
+          // Log high accuracy achievement
+          const accuracyLevel = accuracy < 20 ? '🟢 HIGH' : accuracy < 50 ? '🟡 MEDIUM' : '🔴 LOW';
+          console.log(`${accuracyLevel} Accuracy: ${accuracy.toFixed(0)}m | GPS: (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`);
+
+          // Prepare data with extended accuracy info
+          const location = {
+            latitude,
+            longitude,
+            accuracy,
+            altitudeAccuracy,
+            timestamp,
+            source: 'GPS_HIGH_ACCURACY',
+          };
+
+          // Send via Socket.io
+          socket.emit('driver:location', {
+            driverId: vehicleId,
+            location,
+          });
+
+          console.log(`📍 Sent #${updatesSent}: (${latitude.toFixed(6)}, ${longitude.toFixed(6)}) [${accuracy.toFixed(0)}m]`);
+        },
+        (error) => {
+          console.error('❌ Geolocation Error:', error.message);
+          console.error('Error Code:', error.code);
+          // 1 = PERMISSION_DENIED, 2 = POSITION_UNAVAILABLE, 3 = TIMEOUT
+          handleGeolocationError(error);
+        },
+        geoOptions
+      );
+    }
+
+    // Send Manual Location (Fallback)
+    function sendManualLocation() {
+      const vehicleId = document.getElementById('vehicleId').value;
+      const lat = parseFloat(document.getElementById('manualLat').value);
+      const lng = parseFloat(document.getElementById('manualLng').value);
+
+      if (!vehicleId.trim()) {
+        showMessage('Please enter a Vehicle ID', 'error');
+        return;
+      }
+
+      if (isNaN(lat) || isNaN(lng)) {
+        showMessage('Please enter valid latitude and longitude', 'error');
+        return;
+      }
+
+      if (!socket || !socket.connected) {
+        showMessage('Not connected to server', 'error');
+        return;
+      }
+
+      const timestamp = Date.now();
+      updatesSent++;
+
+      document.getElementById('updateCount').textContent = updatesSent;
+      document.getElementById('lastLat').textContent = lat.toFixed(6);
+      document.getElementById('lastLng').textContent = lng.toFixed(6);
+      document.getElementById('lastTimestamp').textContent = new Date(timestamp).toLocaleTimeString();
+
+      const location = {
+        latitude: lat,
+        longitude: lng,
+        accuracy: 10,
+        timestamp,
+      };
+
+      socket.emit('driver:location', {
+        driverId: vehicleId,
+        location,
+      });
+
+      showMessage('📍 Manual location sent', 'success');
+      console.log(`📍 Manual sent #${updatesSent}: (${lat.toFixed(6)}, ${lng.toFixed(6)})`);
+
+      // Clear inputs
+      document.getElementById('manualLat').value = '';
+      document.getElementById('manualLng').value = '';
+    }
+
+    // Handle Geolocation Errors
+    function handleGeolocationError(error) {
+      let errorMsg = '';
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          errorMsg = 'Location permission denied. Enable it in settings.';
+          break;
+        case error.POSITION_UNAVAILABLE:
+          errorMsg = 'Location information unavailable.';
+          break;
+        case error.TIMEOUT:
+          errorMsg = 'Location request timed out. Try again.';
+          break;
+        default:
+          errorMsg = `Geolocation error: ${error.message}`;
+      }
+      showMessage(errorMsg, 'error');
+    }
+
+    // Update Connection Status
+    function updateConnectionStatus(connected) {
+      const indicator = document.getElementById('statusIndicator');
+      const statusText = document.getElementById('statusText');
+
+      if (connected) {
+        indicator.classList.add('active');
+        indicator.classList.remove('error');
+        statusText.textContent = 'Connected to server';
+      } else {
+        indicator.classList.remove('active');
+        indicator.classList.add('error');
+        statusText.textContent = 'Disconnected from server';
+      }
+    }
+
+    // Show Messages
+    function showMessage(text, type) {
+      const container = document.getElementById('messageContainer');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `${type}-message`;
+      messageDiv.textContent = text;
+      container.appendChild(messageDiv);
+
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        messageDiv.remove();
+      }, 5000);
+    }
+
+    // Handle manual server URL change
+    document.getElementById('serverUrl').addEventListener('change', () => {
+      if (socket) {
+        socket.disconnect();
+      }
+      connectSocket();
+    });
+
+    // Initialize on page load
+    window.addEventListener('load', init);
+  </script>
+</body>
+</html>
